@@ -1,0 +1,14 @@
+/*
+ * cTV work integerAccessor
+ */
+
+#ifndef IntegerAcccessor_H__
+# define IntegerAcccessor_H__
+
+namespace cTVScript {
+
+
+
+};
+
+#endif
