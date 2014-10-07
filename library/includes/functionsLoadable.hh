@@ -1,10 +1,18 @@
 #ifndef FunctionsAccessible_H__
 # define FunctionsAccessible_H__
 
-#include "error.hh"
+#include <vector>
+
+#include "error.h"
 #include "unpacker.hh"
 
 namespace cTVScript {
+
+  struct parametersPack{
+    Loadable*			_this;
+    Loadable*			_return;
+    std::vector<Loadable*>	_arguments;
+  };
 
   class functionLoadable : public Loadable{
   public:
@@ -18,7 +26,7 @@ namespace cTVScript {
   public:
     virtual void call(parametersPack& pack) {
       //create return here
-      Unpacker::applyFunction(pack.arguments, fn);
+      Unpacker::applyFunction(pack._arguments, fn);
     }
     StaticLoadableFunction(Return (*_fn)(Arguments...)) : fn(_fn){}
   };
@@ -29,7 +37,7 @@ namespace cTVScript {
     void (*fn)(Arguments...);
   public:
     virtual void call(parametersPack& pack) {
-      Unpacker::applyFunction(pack.arguments, fn);
+      Unpacker::applyFunction(pack._arguments, fn);
     }
     StaticLoadableFunction(void (*_fn)(Arguments...)) : fn(_fn){}
   };
@@ -37,26 +45,26 @@ namespace cTVScript {
   template <typename Object, typename Return, typename... Arguments>
   class LoadableMethode : public functionLoadable {
   private:
-    Return (*fn)(Arguments...);
+    Return (Object::*fn)(Arguments...);
   public:
     virtual void call(parametersPack& pack) {
       //create return here
       //unpack this here
-      Unpacker::applyMethode(pack.arguments, fn);
+      Unpacker::applyMethode(pack._arguments, fn);
     }
-    LoadableMethode(Return (*_fn)(Arguments...)) : fn(_fn){}
+    LoadableMethode(Return (Object::*_fn)(Arguments...)) : fn(_fn){}
   };
 
   template <typename Object, typename... Arguments>
-  class LoadableMethode<void, Arguments...> : public functionLoadable{
+  class LoadableMethode<Object, void, Arguments...> : public functionLoadable{
   private:
-    void (*fn)(Arguments...);
+    void (Object::*fn)(Arguments...);
   public:
     virtual void call(parametersPack& pack) {
       //unpack this here
-      Unpacker::applyMethode(pack.arguments, fn);
+      Unpacker::applyMethode(pack._arguments, fn);
     }
-    LoadableMethode(void (*_fn)(Arguments...)) : fn(_fn){}
+    LoadableMethode(void (Object::*_fn)(Arguments...)) : fn(_fn){}
   };
 
 };

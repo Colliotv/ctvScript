@@ -5,26 +5,49 @@
 #ifndef IntegerLoadable_H__
 # define IntegerLoadable_H__
 
-#include "accessor.hh"
+#include "helper.hh"
+
+#include "Accessor.hh"
 
 namespace cTVScript {
 
-  template<typename prim>
-  class primaryLoadable : public Loadable {
+  class stringLoadable : public Loadable {
   private:
-    prim&	loadable;
+    std::string value;
+
   public:
-    primaryLoadable(prim& _p, std::string& name)
-      : Loadable(name), loadable(_p) {
-      registerType(Helper::TypePriorityFor<prim>::get());
+    stringLoadable(const std::string& name, const std::string& _v = "") 
+      : Loadable(name), value(_v) {
+      registerPriority(Helper::TypePriorityFor<std::string>::get());
+    }
+
+  public:
+    std::string  getLockedValue() { return value; }
+    std::string& unlock(std::shared_ptr<cTVScript::Key> key) {
+      key->notify(this);
+      return value;
     }
   };
 
-  template<typename prim>
-  primaryLoadable<prim>* makePrimaryLoadable(prim& _p, std::string& name) {
-    return (new primaryLoadable<prim>(_p, name));
-  }
+  template<typename type>
+  class primaryLoadable : public Loadable {
+  private:
+    type&	value;
 
+  public:
+    primaryLoadable(const std::string& name, type _p = 0)
+      : Loadable(name), value(_p) {
+      registerPriority(Helper::TypePriorityFor<type>::get());
+    }
+    ~primaryLoadable() {}
+
+  public:
+    type  getLockedValue() { return value; }
+    type& unlock(std::shared_ptr<cTVScript::Key> key) {
+      key->notify(this);
+      return value;
+    }
+  };
 };
 
 #endif

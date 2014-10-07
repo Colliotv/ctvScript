@@ -4,4 +4,8 @@
 #include "Loader.hh"
 #include "Accessor.hh"
 
+#include "objectLoadable.hh"
+#include "primaryLoadable.hh"
+#include "functionsLoadable.hh"
+
 #endif

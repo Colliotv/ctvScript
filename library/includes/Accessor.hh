@@ -7,6 +7,7 @@
 # define Accessor_H__
 
 # include <string>
+# include <memory>
 
 # include "error.h"
 
@@ -30,6 +31,17 @@ namespace cTVScript {
   };
 
 
+  class Key{
+  public:
+    static std::shared_ptr<Key> create() { return std::shared_ptr<Key> (new Key()); }
+    void	notify(Loadable*) {}
+
+  public:
+    ~Key();
+  private:
+    Key();
+  };
+
   class Loadable{
   protected:
     friend class Surveyor;
@@ -37,38 +49,35 @@ namespace cTVScript {
     std::string path;
     std::string name;
   public:
-    Loadable(std::string& _n) : name(_n) {}
-    virtual ~Loadable();
+    Loadable(const std::string& _n) : name(_n) {}
+    virtual ~Loadable() {}
 
   private:
-    typedef unsigned int type;
-    type _t;
+    typedef unsigned int priority;
+    priority _t;
   protected:
-    void		registerType(type t) { _t = t; }
+    void		registerPriority(priority t) { _t = t; }
   public:
-    type		getType();
+    priority		getPriority() { return (_t); }
 
   public:
-    virtual const std::string& getAsString() {return "";}
+    virtual const std::string getAsString() {return "";}
  
-    virtual Loadable& operator==(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator&&(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator||(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator<(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator>(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator>=(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator<=(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator=(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator+(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator-(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator*(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator/(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& invertDiv(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator%(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& invertMod(Loadable&)	{throw cTVScript::IsAnObject(this.name);}
-    virtual Loadable& operator[](std::string&)	{throw cTVScript::CantAccessSubCHilds(this.name);}
+    virtual Loadable* operator==(Loadable*)		{throw cTVScript::InvalidAction("==",	this->name);}
+    virtual Loadable* operator<(Loadable*)		{throw cTVScript::InvalidAction("<",	this->name);}
+    virtual Loadable* operator>(Loadable*)		{throw cTVScript::InvalidAction(">",	this->name);}
+    virtual Loadable* operator>=(Loadable*)		{throw cTVScript::InvalidAction(">=",	this->name);}
+    virtual Loadable* operator<=(Loadable*)		{throw cTVScript::InvalidAction("<=",	this->name);}
+    virtual Loadable* operator=(Loadable*)		{throw cTVScript::InvalidAction("=",	this->name);}
+    virtual Loadable* operator+(Loadable*)		{throw cTVScript::InvalidAction("+",	this->name);}
+    virtual Loadable* operator-(Loadable*)		{throw cTVScript::InvalidAction("-",	this->name);}
+    virtual Loadable* operator*(Loadable*)		{throw cTVScript::InvalidAction("*",	this->name);}
+    virtual Loadable* operator/(Loadable*)		{throw cTVScript::InvalidAction("/",	this->name);}
+    virtual Loadable* invertDiv(Loadable*)		{throw cTVScript::InvalidAction("/",	this->name);}
+    virtual Loadable* operator%(Loadable*)		{throw cTVScript::InvalidAction("%",	this->name);}
+    virtual Loadable* invertMod(Loadable*)		{throw cTVScript::InvalidAction("%",	this->name);}
+    virtual Loadable* operator[](const std::string&)	{throw cTVScript::InvalidAction("[]",	this->name);}
   };
-
 };
 
 #endif

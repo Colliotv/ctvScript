@@ -1,6 +1,8 @@
 #ifndef HELPER_H__
 # define HELPER_H__
 
+#include <type_traits>
+
 namespace cTVScript {
   namespace Helper {
 
@@ -26,11 +28,11 @@ namespace cTVScript {
     };
 
     template<typename type>
-    arg FromString(const std::string& s) {
+    type FromString(const std::string& s) {
       return (from<0
 	    + (!std::is_floating_point<type>::value ?
 	       (std::is_signed<type>::value == true) : (0))
-	      + (std::is_integral<type>::value == true)>::string<type>(s));
+	      + (std::is_integral<type>::value == true)>::template string<type>(s));
     }
 
 

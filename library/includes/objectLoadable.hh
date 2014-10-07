@@ -4,30 +4,36 @@
 #ifndef ObjectLoadable_h__
 # define ObjectLoadable_h__
 
-# include "accessor.h"
+# include "status.h"
+
+# include "Accessor.hh"
 
 namespace cTVScript{
 
   class ObjectLoadable : public Loadable{
   private:
     std::map<std::string, Loadable*> childNodes;
+
   public:
-    void addSubObject(Loadable* object, std::string name) throw cTVScript::ChildNameAlreadyExist;
+    ObjectLoadable(const std::string& name) : Loadable(name) {}
+
+  public:
+    cTVScript::loading_status addObject(Loadable* object, std::string name);
 
   public: // redefined operands
-    virtual Loadable& operator[](std::string& name);
+    virtual Loadable* operator[](const std::string& name);
   };
 
 
   class Context : public ObjectLoadable{
   public:
-    static void addObject(Loadable* object, std::string name) throw cTVScript::ChildNameAlreadyExist {
-      getSelf()->addSubObject(object, name);
+    static cTVScript::loading_status addObject(Loadable* object, std::string name) {
+      return (getSelf()->addObject(object, name));
     }
 
   private: // singleton
     static Context* getSelf();
-    Context() {path = ""; name = ""};
+    Context() : ObjectLoadable("context") {};
     ~Context();
   };
 };

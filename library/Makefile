@@ -11,8 +11,7 @@ MAIN	= src/Test/main.cpp
 ########################
 SRC	=  $(MAIN)
 
-FLAGS	= -W -Wall -Wextra $(INC)				\
-	-I lib/Gdl_lib/includes --std=c++0x -g3
+FLAGS	= -W -Wall -Wextra $(INC) -std=c++0x
 
 CFLAGS		+= $(FLAGS)
 LDFLAGS		= 

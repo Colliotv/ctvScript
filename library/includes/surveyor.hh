@@ -40,6 +40,6 @@ namespace cTVScript {
     void	flushEvents();
     void	treatEvents() throw ScriptError; // need to be specificated
   }
-}
+};
 
 #endif
