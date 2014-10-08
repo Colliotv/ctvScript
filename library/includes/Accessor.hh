@@ -26,6 +26,10 @@ namespace cTVScript {
   class primaryAcccessible;
   class stringLoadable;
 
+  /* defined in functionLoadable.hh*/
+  class functionLoadable;
+  struct parametersPack;
+
   class Accessor{
   private:
   };
@@ -43,8 +47,11 @@ namespace cTVScript {
   };
   typedef std::shared_ptr<Key> DestructibleKey;
 
+
+
   class Loadable{
   protected:
+  public:
     friend class Surveyor;
     friend class Accessor;
     std::string path;
@@ -56,7 +63,6 @@ namespace cTVScript {
 				   const std::string& separator = ".") {
       path = pathFrom + separator + name;
     }
-
 
   public:
     Loadable(const std::string& _n) : name(_n), _t(0) {}
@@ -87,6 +93,7 @@ namespace cTVScript {
     virtual Loadable* operator%(Loadable*)		{throw cTVScript::InvalidAction("%",	this->name);}
     virtual Loadable* invertMod(Loadable*)		{throw cTVScript::InvalidAction("%",	this->name);}
     virtual Loadable* operator[](const std::string&)	{throw cTVScript::InvalidAction("[]",	this->name);}
+    virtual void      operator()(parametersPack&)	{throw cTVScript::InvalidAction("()",	this->name);}
   };
 };
 

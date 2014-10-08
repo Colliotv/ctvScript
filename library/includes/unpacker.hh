@@ -145,6 +145,7 @@ namespace cTVScript{
       }
     };
 
+
     template <typename ReturnType, typename ...Arguments>
     ReturnType applyFunction(std::shared_ptr<Key> key,
 			     std::vector<Loadable*> args,
@@ -152,8 +153,6 @@ namespace cTVScript{
       return (unfolder<sizeof...(Arguments)>::applyFunc(key, args, fn));
     }
 
-
-    TODO("finish unpacker")
     template <typename Object, typename ReturnType, typename ...Arguments>
     ReturnType applyMethode(std::shared_ptr<Key> key,
 			    std::vector<Loadable*> args,

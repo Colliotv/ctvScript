@@ -42,7 +42,6 @@ namespace cTVScript {
     };
   };
 
-
   struct parametersPack{
     Loadable*			_this;
     Loadable*&			_return;
@@ -52,6 +51,9 @@ namespace cTVScript {
   class functionLoadable : public Loadable{
   public:
     virtual void call(parametersPack& pack) = 0;
+    virtual void operator()(parametersPack& pack) {
+      call(pack);
+    }
 
   public:
     functionLoadable(const std::string& name)

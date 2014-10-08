@@ -9,9 +9,6 @@
 
 #include "Accessor.hh"
 
-#define DO_PRAGMA(x) _Pragma (#x)
-#define TODO(x) DO_PRAGMA(message ("\nTODO - [" __FILE__ "]:" #x))
-
 namespace cTVScript {
 
   class stringLoadable : public Loadable {
