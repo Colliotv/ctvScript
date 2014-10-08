@@ -4,6 +4,9 @@
 #include <vector>
 
 #include "error.h"
+
+#include "SFINAE.hh"
+
 #include "unpacker.hh"
 
 namespace cTVScript {
@@ -160,6 +163,72 @@ namespace cTVScript {
     LoadableMethode(void (Object::*_fn)(Arguments...)) : fn(_fn){}
   };
 
+
+
+  template<bool, bool> struct makeLoadableMethode{};
+
+  template<>
+  struct makeLoadableMethode<false, true>{
+    template<typename Return, typename Object, typename... Arguments>
+    static Loadable* get(const std::string& name, Return (Object::*m)(Arguments...)) {
+      return new LoadableMethode<Object, Return, Arguments...>(name, m);
+    }
+  };
+
+  template<>
+  struct makeLoadableMethode<true, true>{
+    template<typename Return, typename Object, typename... Arguments>
+    static Loadable* get(const std::string& name, Return (Object::*m)(Arguments...)) {
+      static_assert(std::is_reference<Return>::value == true, "[cTVScript error] Loadable Methode can't return a reference value");
+      return NULL;
+    }
+  };
+
+  template<>
+  struct makeLoadableMethode<false, false>{
+    template<typename Return, typename Object, typename... Arguments>
+    static Loadable* get(const std::string& name, Return (Object::*m)(Arguments...)) {
+      static_assert(SFINAE::is_Loadable<Object>::value == false, "[cTVScript error] Loadable Methode this have to herite from Loadable");
+      return NULL;
+    }
+  };
+
+  template<>
+  struct makeLoadableMethode<true, false>{
+    template<typename Return, typename Object, typename... Arguments>
+    static Loadable* get(const std::string& name, Return (Object::*m)(Arguments...)) {
+      static_assert(std::is_reference<Return>::value == true, "[cTVScript error] Loadable Methode can't return a reference value");
+      static_assert(SFINAE::is_Loadable<Object>::value == false, "[cTVScript error] Loadable Methode this have to herite from Loadable");
+      return NULL;
+    }
+  };
+
+  template<typename Return, typename Object, typename... Arguments>
+  Loadable* makeMethodeLoadable(const std::string& name, Return (Object::*m)(Arguments...)) {
+    return makeLoadableMethode<std::is_reference<Return>::value, SFINAE::is_Loadable<Object>::value >::get(name, m);
+  }
+
+
+
+  template<typename Return, typename... Arguments>
+  struct makeLoadableFunction{
+    static Loadable* get(const std::string& name, Return (*m)(Arguments...)) {
+      return new StaticLoadableFunction<Return, Arguments...>(name, m);
+    }
+  };
+
+  template<typename Return, typename... Arguments>
+  struct makeLoadableFunction<Return&, Arguments...>{
+    static Loadable* get(const std::string&, Return& (*)(Arguments...)) {
+      static_assert(std::is_reference<Return>::value == true, "[cTVScript error] Loadable Methode can't return a reference value");
+      return NULL;
+    }
+  };
+
+  template<typename Return, typename... Arguments>
+  Loadable* makeFunctionLoadable(const std::string& name, Return (*m)(Arguments...)) {
+    return makeLoadableFunction<Return, Arguments...>::get(name, m);
+  }
 };
 
 #endif
