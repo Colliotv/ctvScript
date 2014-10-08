@@ -20,7 +20,7 @@ namespace cTVScript{
 	  dynamic_cast< primaryLoadable<arg>* >(l);
 	if (!_l)
 	  throw;
-	return (_l->getLockedValue);
+	return (_l->getLockedValue());
       }
     };
 
@@ -100,9 +100,9 @@ namespace cTVScript{
 				  ReturnType (*fn)(Arguments...),
 				  final&&... args) {
 	return (unfolder<N - 1>::applyFunc
-		(parameters, fn,
+		(key, parameters, fn,
 		 Converter::convertLoadableTo< typename parametersType<N - 1, Arguments...>::type >
-		 ::transform(parameters[N-1]),
+		 ::transform(key, parameters[N-1]),
 		 args...));
       }
     };
@@ -110,8 +110,8 @@ namespace cTVScript{
     template<>
     struct unfolder<0>{
       template <typename ReturnType, typename ...Arguments, typename ...final>
-      static ReturnType applyFunc(std::shared_ptr<Key> key,
-				  std::vector<Loadable*> parameters,
+      static ReturnType applyFunc(std::shared_ptr<Key>,
+				  std::vector<Loadable*>,
 				  ReturnType (*fn)(Arguments...),
 				  final&&... args) {
 	return (fn( args... ));

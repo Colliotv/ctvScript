@@ -37,10 +37,11 @@ namespace cTVScript {
     void	notify(Loadable*) {}
 
   public:
-    ~Key();
+    ~Key() {} // on destruct avert Accessor
   private:
-    Key();
+    Key() {}
   };
+  typedef std::shared_ptr<Key> DestructibleKey;
 
   class Loadable{
   protected:

@@ -17,6 +17,10 @@ namespace cTVScript {
   class functionLoadable : public Loadable{
   public:
     virtual void call(parametersPack& pack) = 0;
+
+  public:
+    functionLoadable(const std::string& name)
+      : Loadable(name) {}
   };
 
   template <typename Return, typename... Arguments>
@@ -26,9 +30,12 @@ namespace cTVScript {
   public:
     virtual void call(parametersPack& pack) {
       //create return here
-      Unpacker::applyFunction(pack._arguments, fn);
+      DestructibleKey key = Key::create();
+      Unpacker::applyFunction(key, pack._arguments, fn);
     }
-    StaticLoadableFunction(Return (*_fn)(Arguments...)) : fn(_fn){}
+    StaticLoadableFunction(const std::string& name,
+			   Return (*_fn)(Arguments...))
+      : functionLoadable(name), fn(_fn){}
   };
 
   template <typename... Arguments>
@@ -39,7 +46,9 @@ namespace cTVScript {
     virtual void call(parametersPack& pack) {
       Unpacker::applyFunction(pack._arguments, fn);
     }
-    StaticLoadableFunction(void (*_fn)(Arguments...)) : fn(_fn){}
+    StaticLoadableFunction(const std::string& name,
+			   void (*_fn)(Arguments...))
+      : functionLoadable(name), fn(_fn){}
   };
 
   template <typename Object, typename Return, typename... Arguments>
