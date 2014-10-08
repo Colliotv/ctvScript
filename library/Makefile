@@ -13,8 +13,9 @@ SRC	=  $(MAIN)
 
 FLAGS	= -W -Wall -Wextra $(INC) -std=c++0x
 
-CFLAGS		+= $(FLAGS)
+CFLAGS	+= $(FLAGS)
 LDFLAGS		= 
+
 
 OBJ		= $(SRC:.cpp=.o)
 

@@ -2,8 +2,11 @@
 # define Unpacker_H__
 
 #include <vector>
+#include <string>
 
 #include "error.h"
+
+#include "helper.hh"
 
 #include "objectLoadable.hh"
 #include "primaryLoadable.hh"
@@ -18,8 +21,11 @@ namespace cTVScript{
       static arg transform(std::shared_ptr<Key>, Loadable* l) {
 	primaryLoadable<arg>* _l =
 	  dynamic_cast< primaryLoadable<arg>* >(l);
-	if (!_l)
-	  throw;
+	if (!_l) {
+	  try { return (Helper::FromString<arg>(l->getAsString())); }
+	  catch (std::invalid_argument) { throw cTVScript::InvalidParameter(Helper::getTypeName<arg>(), l->name); }
+	  catch (std::out_of_range) { throw cTVScript::InvalidParameter(Helper::getTypeName<arg>(), l->name); }
+	}
 	return (_l->getLockedValue());
       }
     };
@@ -30,7 +36,7 @@ namespace cTVScript{
 	primaryLoadable<arg>* _l =
 	  dynamic_cast< primaryLoadable<arg>* >(l);
 	if (!_l)
-	  throw;
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg&>(), l->name);
 	return (_l->unlock(key));
       }
     };
@@ -41,7 +47,7 @@ namespace cTVScript{
 	arg* _l =
 	  dynamic_cast< arg* >(l);
 	if (!_l)
-	  throw;
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->name);
 	return (_l->unlock(key));
       }
     };
@@ -52,7 +58,7 @@ namespace cTVScript{
 	stringLoadable* _l =
 	  dynamic_cast< stringLoadable* >(l);
 	if (!_l)
-	  throw;
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string>(), l->name);
 	return (_l->getLockedValue());
       }
     };
@@ -63,11 +69,10 @@ namespace cTVScript{
 	stringLoadable* _l =
 	  dynamic_cast< stringLoadable* >(l);
 	if (!_l)
-	  throw;
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string&>(), l->name);
 	return (_l->unlock(key));
       }
     };
-
 
   };
 
@@ -125,6 +130,8 @@ namespace cTVScript{
       return (unfolder<sizeof...(Arguments)>::applyFunc(key, args, fn));
     }
 
+
+    TODO("finish unpacker")
     template <typename Object, typename ReturnType, typename ...Arguments>
     ReturnType applyMethode(std::shared_ptr<Key> key,
 			    std::vector<Loadable*> args,

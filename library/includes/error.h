@@ -1,7 +1,11 @@
 #ifndef Error_h__
 # define Error_h__
 
+#include <stdexcept>
+
 #include <string>
+
+#include "helper.hh"
 
 namespace cTVScript{
   class InvalidAction : public std::exception{
@@ -10,7 +14,7 @@ namespace cTVScript{
     std::string name;
 
   public:
-    InvalidAction(std::string _c, std::string _n)
+    InvalidAction(const std::string& _c, const std::string& _n)
       : action(_c), name(_n) {}
     virtual ~InvalidAction() throw() {}
 
@@ -25,6 +29,40 @@ namespace cTVScript{
   protected:
     virtual const std::string causedBy() { return ""; }
   };
+
+  class InvalidParameter : public InvalidAction {
+  public:
+    InvalidParameter(const std::string& type, const std::string& _n)
+      : InvalidAction( "cast object to " + type , _n ) {}
+  };
+
+  class MissingParameters : public InvalidAction {
+  private:
+    std::string prototype;
+
+  public:
+    MissingParameters(const std::string& proto, const std::string& name)
+      : InvalidAction("call()", name), prototype(proto) {}
+    virtual ~MissingParameters() throw() {}
+
+  protected:
+    virtual const std::string causedBy() { return "Not enough arguments"; }
+  };
+
+
+  class TooManyParameters : public InvalidAction {
+  private:
+    std::string prototype;
+
+  public:
+    TooManyParameters(const std::string& proto, const std::string& name)
+      : InvalidAction("call()", name), prototype(proto) {}
+    virtual ~TooManyParameters() throw() {}
+
+  protected:
+    virtual const std::string causedBy() { return "Too Many arguments, prototype is " + prototype; }
+  };
+
 };
 
 #endif

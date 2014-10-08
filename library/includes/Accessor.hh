@@ -48,9 +48,10 @@ namespace cTVScript {
     friend class Surveyor;
     friend class Accessor;
     std::string path;
+  public:
     std::string name;
   public:
-    Loadable(const std::string& _n) : name(_n) {}
+    Loadable(const std::string& _n) : name(_n), _t(0) {}
     virtual ~Loadable() {}
 
   private:
