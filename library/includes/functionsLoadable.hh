@@ -93,7 +93,7 @@ namespace cTVScript {
       pack._return = dynamic_cast<Loadable*> (Unpacker::applyFunction(key, pack._arguments, fn));
     }
     StaticLoadableFunction(const std::string& name,
-			   Return (*_fn)(Arguments...))
+			   Return* (*_fn)(Arguments...))
       : functionLoadable(name), fn(_fn){}
   };
 
@@ -125,10 +125,12 @@ namespace cTVScript {
       else
 	throw cTVScript::TooManyParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
       Object* _this = dynamic_cast<Object*> (pack._this);
+      DestructibleKey key = Key::create();
       pack._return = new typename Helper::DeduceLoadableType<Return>::type ("return",
-									    Unpacker::applyMethode(pack._arguments, _this, fn));
+									    Unpacker::applyMethode(key, pack._arguments, _this, fn));
     }
-    LoadableMethode(Return (Object::*_fn)(Arguments...)) : fn(_fn){}
+    LoadableMethode(const std::string& name, Return (Object::*_fn)(Arguments...))
+      : functionLoadable(name), fn(_fn){}
   };
 
   template <typename Object, typename Return, typename... Arguments>
@@ -142,9 +144,11 @@ namespace cTVScript {
       else
 	throw cTVScript::TooManyParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
       Object* _this = dynamic_cast<Object*> (pack._this);
-      pack._return = dynamic_cast<Loadable*> (Unpacker::applyMethode(pack._arguments, _this, fn));
+      DestructibleKey key = Key::create();
+      pack._return = dynamic_cast<Loadable*> (Unpacker::applyMethode(key, pack._arguments, _this, fn));
     }
-    LoadableMethode(Return (Object::*_fn)(Arguments...)) : fn(_fn){}
+    LoadableMethode(const std::string& name, Return* (Object::*_fn)(Arguments...))
+      : functionLoadable(name), fn(_fn){}
   };
 
   template <typename Object, typename... Arguments>
@@ -158,9 +162,11 @@ namespace cTVScript {
       else
 	throw cTVScript::TooManyParameters(Helper::getTypeName<void (Object::*)(Arguments...)>(), this->name);
       Object* _this = dynamic_cast<Object*> (pack._this);
-      Unpacker::applyMethode(pack._arguments, _this, fn);
+      DestructibleKey key = Key::create();
+      Unpacker::applyMethode(key, pack._arguments, _this, fn);
     }
-    LoadableMethode(void (Object::*_fn)(Arguments...)) : fn(_fn){}
+    LoadableMethode(const std::string& name, void (Object::*_fn)(Arguments...))
+      : functionLoadable(name), fn(_fn){}
   };
 
 
@@ -178,7 +184,7 @@ namespace cTVScript {
   template<>
   struct makeLoadableMethode<true, true>{
     template<typename Return, typename Object, typename... Arguments>
-    static Loadable* get(const std::string& name, Return (Object::*m)(Arguments...)) {
+    static Loadable* get(const std::string&, Return (Object::*)(Arguments...)) {
       static_assert(std::is_reference<Return>::value == true, "[cTVScript error] Loadable Methode can't return a reference value");
       return NULL;
     }
@@ -187,8 +193,8 @@ namespace cTVScript {
   template<>
   struct makeLoadableMethode<false, false>{
     template<typename Return, typename Object, typename... Arguments>
-    static Loadable* get(const std::string& name, Return (Object::*m)(Arguments...)) {
-      static_assert(SFINAE::is_Loadable<Object>::value == false, "[cTVScript error] Loadable Methode this have to herite from Loadable");
+    static Loadable* get(const std::string&, Return (Object::*)(Arguments...)) {
+      static_assert(SFINAE::is_Loadable<Object*>::value == true, "[cTVScript error] Loadable Methode class have to herite from Loadable");
       return NULL;
     }
   };
@@ -196,16 +202,16 @@ namespace cTVScript {
   template<>
   struct makeLoadableMethode<true, false>{
     template<typename Return, typename Object, typename... Arguments>
-    static Loadable* get(const std::string& name, Return (Object::*m)(Arguments...)) {
+    static Loadable* get(const std::string&, Return (Object::*)(Arguments...)) {
       static_assert(std::is_reference<Return>::value == true, "[cTVScript error] Loadable Methode can't return a reference value");
-      static_assert(SFINAE::is_Loadable<Object>::value == false, "[cTVScript error] Loadable Methode this have to herite from Loadable");
+      static_assert(SFINAE::is_Loadable<Object*>::value == true, "[cTVScript error] Loadable Methode class have to herite from Loadable");
       return NULL;
     }
   };
 
   template<typename Return, typename Object, typename... Arguments>
   Loadable* makeMethodeLoadable(const std::string& name, Return (Object::*m)(Arguments...)) {
-    return makeLoadableMethode<std::is_reference<Return>::value, SFINAE::is_Loadable<Object>::value >::get(name, m);
+    return makeLoadableMethode<std::is_reference<Return>::value, SFINAE::is_Loadable<Object*>::value >::get(name, m);
   }
 
 

@@ -12,7 +12,7 @@ namespace cTVScript{
     template<typename object>
     struct is_Loadable{
       template <typename UpObject>
-      static decltype(std::declval<Loadable*>() = std::declval<UpObject>(), one())
+      static decltype(std::declval<Loadable*&>() = std::declval<UpObject>(), one())
 	test(int);
   
       template<typename>

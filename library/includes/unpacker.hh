@@ -23,8 +23,8 @@ namespace cTVScript{
 	  dynamic_cast< primaryLoadable<arg>* >(l);
 	if (!_l) {
 	  try { return (Helper::FromString<arg>(l->getAsString())); }
-	  catch (std::invalid_argument) { throw cTVScript::InvalidParameter(Helper::getTypeName<arg>(), l->name); }
-	  catch (std::out_of_range) { throw cTVScript::InvalidParameter(Helper::getTypeName<arg>(), l->name); }
+	  catch (std::invalid_argument) { throw cTVScript::InvalidParameter(Helper::getTypeName<arg>(), l->getName()); }
+	  catch (std::out_of_range) { throw cTVScript::InvalidParameter(Helper::getTypeName<arg>(), l->getName()); }
 	}
 	return (_l->getLockedValue());
       }
@@ -36,7 +36,7 @@ namespace cTVScript{
 	primaryLoadable<arg>* _l =
 	  dynamic_cast< primaryLoadable<arg>* >(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg&>(), l->name);
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg&>(), l->getName());
 	return (_l->unlock(key));
       }
     };
@@ -47,7 +47,7 @@ namespace cTVScript{
 	arg* _l =
 	  dynamic_cast< arg* >(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->name);
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
 	return (_l->unlock(key));
       }
     };
@@ -58,7 +58,7 @@ namespace cTVScript{
 	stringLoadable* _l =
 	  dynamic_cast< stringLoadable* >(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string>(), l->name);
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string>(), l->getName());
 	return (_l->getLockedValue());
       }
     };
@@ -69,7 +69,7 @@ namespace cTVScript{
 	stringLoadable* _l =
 	  dynamic_cast< stringLoadable* >(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string&>(), l->name);
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string&>(), l->getName());
 	return (_l->unlock(key));
       }
     };
@@ -110,6 +110,19 @@ namespace cTVScript{
 		 ::transform(key, parameters[N-1]),
 		 args...));
       }
+
+      template <typename ReturnType, typename Object, typename... Arguments, typename ...final>
+      static ReturnType applyMethode(std::shared_ptr<Key> key,
+				     std::vector<Loadable*> parameters,
+				     Object*	_this,
+				     ReturnType (Object::*fn)(Arguments...),
+				     final&&... args) {
+	return (unfolder<N - 1>::applyMethode
+		(key, parameters, _this, fn,
+		 Converter::convertLoadableTo< typename parametersType<N - 1, Arguments...>::type >
+		 ::transform(key, parameters[N-1]),
+		 args...));
+      }
     };
 
     template<>
@@ -120,6 +133,15 @@ namespace cTVScript{
 				  ReturnType (*fn)(Arguments...),
 				  final&&... args) {
 	return (fn( args... ));
+      }
+
+      template <typename ReturnType, typename Object, typename ...Arguments, typename ...final>
+      static ReturnType applyMethode(std::shared_ptr<Key>,
+				     std::vector<Loadable*>,
+				     Object*	_this,
+				     ReturnType (Object::*fn)(Arguments...),
+				     final&&... args) {
+	return ((_this->*fn)( args... ));
       }
     };
 

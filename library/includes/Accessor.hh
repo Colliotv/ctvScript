@@ -48,8 +48,16 @@ namespace cTVScript {
     friend class Surveyor;
     friend class Accessor;
     std::string path;
-  public:
     std::string name;
+
+  public:
+    const std::string&		getName() { return (name); }
+    virtual void	updatePath(const std::string& pathFrom,
+				   const std::string& separator = ".") {
+      path = pathFrom + separator + name;
+    }
+
+
   public:
     Loadable(const std::string& _n) : name(_n), _t(0) {}
     virtual ~Loadable() {}
