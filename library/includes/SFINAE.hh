@@ -1,7 +1,7 @@
 #ifndef loadableSFINAE_h__
 # define loadableSFINAE_h__
 
-#include "Accessor.hh"
+#include "Loadable.hh"
 
 namespace cTVScript{
   namespace SFINAE{

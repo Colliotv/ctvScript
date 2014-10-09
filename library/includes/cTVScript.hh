@@ -7,13 +7,13 @@
 
 #include "helper.hh"
 
-TODO("Loader, Accessor, ScriptExecutor")
-TODO(" - Prio : Key and Accessor")
+TODO("Loader, Surveyor, ScriptExecutor")
+TODO(" - Prio : Key and Surveyor")
 TODO(" - Secundo : ScriptExecutor")
 TODO(" - Tertio ; Loader");
 
 #include "Loader.hh"
-#include "Accessor.hh"
+#include "Loadable.hh"
 
 #include "objectLoadable.hh"
 #include "primaryLoadable.hh"

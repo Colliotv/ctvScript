@@ -6,9 +6,9 @@
 #include "error.h"
 
 #include "SFINAE.hh"
-
 #include "unpacker.hh"
 
+#include "Loadable.hh"
 namespace cTVScript {
 
   namespace Helper {

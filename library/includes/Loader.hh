@@ -11,7 +11,7 @@
 
 # include "utils.h"
 
-# include "Accessor.hh"
+# include "Loadable.hh"
 
 namespace cTVScript {
 

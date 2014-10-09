@@ -30,6 +30,11 @@ namespace cTVScript{
     virtual const std::string causedBy() { return ""; }
   };
 
+  class unSerialized : public InvalidAction {
+  public:
+    unSerialized(const std::string& name) : InvalidAction("serialization", name) {}
+  };
+
   class InvalidParameter : public InvalidAction {
   public:
     InvalidParameter(const std::string& type, const std::string& _n)

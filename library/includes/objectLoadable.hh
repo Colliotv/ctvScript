@@ -7,17 +7,19 @@
 # include <algorithm>
 
 # include "status.h"
+# include "patternConstructor.hh"
 
-# include "Accessor.hh"
+# include "Loadable.hh"
 
 namespace cTVScript{
 
   class objectLoadable : public Loadable{
+  public:
+    DEFAULT_CONSTRUCTOR(objectLoadable);
+    NEGATE_VALUE_GETTER();
+
   private:
     std::map<std::string, Loadable*> childNodes;
-
-  public:
-    objectLoadable(const std::string& name) : Loadable(name) {}
 
   protected:
     virtual void	updateSelectedChild(Loadable* object) {
@@ -28,7 +30,11 @@ namespace cTVScript{
     cTVScript::loading_status	addObject(Loadable* object) {
       if (childNodes.count(object->getName()))
 	return (ALREADY_EXIST);
+#if __cplusplus > 199711L
       childNodes.emplace(std::make_pair(object->getName(), object));
+#else
+      childNodes.insert(std::make_pair(object->getName(), object));
+#endif
       updateSelectedChild(object);
       return (CLEAR);
     }
