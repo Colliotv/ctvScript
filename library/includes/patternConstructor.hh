@@ -30,6 +30,7 @@ private:								\
   virtual Loadable* operator = (const Loadable& oth) {			\
     if (getPriority() > oth.getPriority())				\
       throw cTVScript::InvalidAction("=", oth.getName());		\
+    Surveyor::get()->update(this);					\
     return ( new __type__ ("", value = __conv__ (oth.getAsString())) ); \
   }
 # define MATHEMATICAL_OPERATOR(__op__, __conv__, __type__)		\

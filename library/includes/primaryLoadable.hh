@@ -9,6 +9,7 @@
 #include "patternConstructor.hh"
 
 #include "Loadable.hh"
+#include "key.hh"
 
 namespace cTVScript {
 

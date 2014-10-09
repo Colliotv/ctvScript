@@ -8,6 +8,7 @@
 
 # include <string>
 # include <memory>
+# include <vector>
 
 # include "error.h"
 
@@ -28,21 +29,6 @@ namespace cTVScript {
   /* defined in functionLoadable.hh*/
   class functionLoadable;
   struct parametersPack;
-
-
-  class Key{
-  public:
-    static std::shared_ptr<Key> create() { return std::shared_ptr<Key> (new Key()); }
-    void	notify(Loadable*) {}
-
-  public:
-    ~Key() {} // on destruct avert Surveyor
-  private:
-    Key() {}
-  };
-  typedef std::shared_ptr<Key> DestructibleKey;
-
-
 
   class Loadable{
   protected:

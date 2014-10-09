@@ -9,12 +9,18 @@
 
 # include "Loadable.hh"
 
+# include "ScriptCallback.hh"
+
 namespace cTVScript {
 
   class Surveyor {
   public:
     MAKE_SINGLETON(Surveyor,,,);
 
+  public:
+    void	update(const Loadable*) {
+      
+    }
   };
 
 };
