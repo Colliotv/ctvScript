@@ -1,6 +1,25 @@
 #ifndef PatternConstructor_h__
 # define PatternConstructor_h__
 
+
+/* Singleton Pattern */
+
+# define MAKE_SINGLETON(__class_name__, __initializer_list__,		\
+			__onCreate__, __onDestroy__)			\
+  static __class_name__ * get() {					\
+    static __class_name__ * singleton;					\
+    return (! singleton ?						\
+	    singleton = new __class_name__ () : singleton);		\
+  }									\
+  static void destroy() {						\
+    __class_name__ * singleton = get();					\
+    delete singleton;							\
+  }									\
+private:								\
+ __class_name__ () __initializer_list__ { __onCreate__ }		\
+ ~ __class_name__ () { __onDestroy__ }					\
+
+/* loadable Easier Class construction */
 # define COMPARAND_OPERATOR(__op__, __conv__)				\
   virtual bool operator __op__ (const Loadable& oth) const {		\
     if (getPriority() > oth.getPriority())				\

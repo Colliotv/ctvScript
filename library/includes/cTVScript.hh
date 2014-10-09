@@ -12,6 +12,7 @@ TODO(" - Prio : Key and Surveyor")
 TODO(" - Secundo : ScriptExecutor")
 TODO(" - Tertio ; Loader");
 
+#include "Surveyor.hh"
 #include "Loader.hh"
 #include "Loadable.hh"
 
