@@ -10,33 +10,9 @@
 
 #include "Loadable.hh"
 
+#include "typeToLoadable.hh"
+
 namespace cTVScript {
-
-  namespace Helper {
-
-    template<typename _type>
-    struct DeduceLoadableType;
-
-    template<typename _type>
-    struct DeduceLoadableType {
-      typedef primaryLoadable<_type> type;
-    };
-
-    template<typename _type>
-    struct DeduceLoadableType<_type&> {
-      typedef ReferenceWrapper< primaryLoadable<_type> > type;
-    };
-
-    template<>
-    struct DeduceLoadableType<std::string> {
-      typedef stringLoadable type;
-    };
-
-    template<>
-    struct DeduceLoadableType<std::string&> {
-      typedef ReferenceWrapper< stringLoadable > type;
-    };
-  };
 
   struct parametersPack{
     Loadable*			_this;

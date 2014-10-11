@@ -14,9 +14,6 @@
 
 namespace cTVScript {
 
-  class Surveyor;
-  class Loadable;
-
   /* defined in objectLoadable.hh */
   class ObjectLoadable;
   class Context;
@@ -29,6 +26,14 @@ namespace cTVScript {
   /* defined in functionLoadable.hh*/
   class functionLoadable;
   struct parametersPack;
+
+  /* defined in LoadableReferenceWrapper */
+  template<typename t>
+  class ReferenceWrapper;
+
+  /* defined in arrayLoadable.hh */
+  template<typename t>
+  class arrayLoadable;
 
   class Loadable{
   protected:
@@ -80,6 +85,8 @@ namespace cTVScript {
     virtual Loadable* invertMod(const Loadable&) const	{throw cTVScript::InvalidAction("%",	this->name);}
 
     virtual Loadable* operator[](const std::string&)	{throw cTVScript::InvalidAction("[]",	this->name);}
+
+    virtual Loadable* operator[](size_t)		{throw cTVScript::InvalidAction("[]",	this->name);}
 
     virtual void      operator()(parametersPack&)	{throw cTVScript::InvalidAction("()",	this->name);}
   };

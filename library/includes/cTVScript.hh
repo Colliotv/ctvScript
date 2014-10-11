@@ -11,6 +11,7 @@ TODO("Loader, Surveyor, ScriptExecutor")
 TODO(" - Prio : Key and Surveyor")
 TODO(" - Secundo : ScriptExecutor")
 TODO(" - Tertio ; Loader");
+TODO(" - Whenever : make a little lift in the name (end the length><)")
 
 #include "Surveyor.hh"
 #include "Loader.hh"
@@ -20,6 +21,7 @@ TODO(" - Tertio ; Loader");
 #include "primaryLoadable.hh"
 #include "functionsLoadable.hh"
 #include "LoadableReferenceWrapper.hh"
+#include "primaryArray.hh"
 
 
 TODO("undef all includes pre-empter")

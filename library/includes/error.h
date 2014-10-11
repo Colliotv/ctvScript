@@ -35,6 +35,21 @@ namespace cTVScript{
     unSerialized(const std::string& name) : InvalidAction("serialization", name) {}
   };
 
+  class out_of_bound : public InvalidAction {
+  private:
+    size_t off, size;
+
+  public:
+    out_of_bound(const std::string& name, size_t _off, size_t _size)
+      : InvalidAction("deferencing", name), off(_off), size(_size) {}
+
+  protected:
+    virtual const std::string causedBy() {
+      return ("at offset [" + std::to_string(off) +
+	      "] in an array of size: " + std::to_string(size));
+	}
+  };
+
   class InvalidParameter : public InvalidAction {
   public:
     InvalidParameter(const std::string& type, const std::string& _n)

@@ -7,10 +7,12 @@
 #include "error.h"
 
 #include "helper.hh"
+#include "SFINAE.hh"
 
 #include "objectLoadable.hh"
 #include "primaryLoadable.hh"
 #include "LoadableReferenceWrapper.hh"
+#include "primaryArray.hh"
 
 namespace cTVScript{
   namespace Converter{
@@ -42,16 +44,43 @@ namespace cTVScript{
       }
     };
 
-    template <typename arg>
-    struct convertLoadableTo<arg*>{ // object*
-      static arg* transform(std::shared_ptr<Key> key, Loadable* l) {
-	arg* _l =
-	  dynamic_cast< arg* >(l);
+    template<typename arg, bool a>
+    struct partObj;
+
+    template<typename arg>
+    struct partObj<arg, true>{
+      static arg* specT(std::shared_ptr<Key> key, Loadable* l) {
+	arg* _l = dynamic_cast<arg*>(l);
+	if (!_l)
+	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
+	return (_l);
+      }
+    };
+
+    template<typename arg>
+    struct partObj<arg, false> {
+      static arg* specT(std::shared_ptr<Key> key, Loadable* l) {
+	auto _l =
+	  dynamic_cast< arrayLoadable< arg >* >(l);
 	if (!_l)
 	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
 	return (_l->unlock(key));
       }
     };
+
+    template <typename arg>
+    struct convertLoadableTo< arg* >{ // object*
+      static arg* transform(std::shared_ptr<Key> k, Loadable* l) {
+	return (partObj<arg, SFINAE::is_Loadable<arg>::value>::specT(k, l));
+      }
+    };
+
+    /*
+    template <typename arg>
+    struct convertLoadableTo< typename std::enable_if< !SFINAE::is_Loadable<arg>::value, arg*>::type >{ // object*
+      static arg* transform(std::shared_ptr<Key> key, Loadable* l) {
+      }
+      };*/
 
     template <>
     struct convertLoadableTo<std::string>{ // std::string

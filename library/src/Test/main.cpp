@@ -13,7 +13,7 @@ int f2(int, double, char) {
   return (0);
 }
 
-int& f3(int, double, char){
+int& f3(int, double, char*){
   return (helper);
 }
 

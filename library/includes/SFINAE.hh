@@ -6,8 +6,8 @@
 namespace cTVScript{
   namespace SFINAE{
 
-    typedef char one;
-    typedef short two;
+    typedef struct{ char t[1]; } one;
+    typedef struct{ char t[2]; } two;
 
     template<typename object>
     struct is_Loadable{
