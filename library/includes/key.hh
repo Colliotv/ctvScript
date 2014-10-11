@@ -5,10 +5,10 @@ namespace cTVScript {
 
   class Key{
   private:
-    std::vector<Loadable*> changed;
+    std::vector<const Loadable*> changed;
   public:
     static std::shared_ptr<Key> create() { return std::shared_ptr<Key> (new Key()); }
-    void	notify(const Loadable*) {}
+    void	notify(const Loadable* l) { changed.push_back(l); }
 
   public:
     ~Key() {

@@ -35,6 +35,7 @@ namespace cTVScript {
   public:
     friend class Surveyor;
     friend class Accessor;
+    friend class ScriptCallback;
     std::string path;
     std::string name;
 

@@ -9,36 +9,32 @@
 #include "unpacker.hh"
 
 #include "Loadable.hh"
+
 namespace cTVScript {
 
   namespace Helper {
 
-    TODO("find a work-around in order to make & returnable")
     template<typename _type>
     struct DeduceLoadableType;
 
     template<typename _type>
     struct DeduceLoadableType {
-      static const bool isConstructible = true;
       typedef primaryLoadable<_type> type;
     };
 
     template<typename _type>
     struct DeduceLoadableType<_type&> {
-      static const bool isConstructible = false;
-      //here is the error
+      typedef ReferenceWrapper< primaryLoadable<_type> > type;
     };
 
     template<>
     struct DeduceLoadableType<std::string> {
-      static const bool isConstructible = false;
       typedef stringLoadable type;
     };
 
     template<>
     struct DeduceLoadableType<std::string&> {
-      static const bool isConstructible = false;
-      //here is the error
+      typedef ReferenceWrapper< stringLoadable > type;
     };
   };
 
@@ -50,6 +46,7 @@ namespace cTVScript {
 
   class functionLoadable : public Loadable{
   public:
+    NEGATE_VALUE_GETTER();
     virtual void call(parametersPack& pack) = 0;
     virtual void operator()(parametersPack& pack) {
       call(pack);
@@ -173,10 +170,10 @@ namespace cTVScript {
 
 
 
-  template<bool, bool> struct makeLoadableMethode{};
+  template<bool> struct makeLoadableMethode{};
 
   template<>
-  struct makeLoadableMethode<false, true>{
+  struct makeLoadableMethode<true>{
     template<typename Return, typename Object, typename... Arguments>
     static Loadable* get(const std::string& name, Return (Object::*m)(Arguments...)) {
       return new LoadableMethode<Object, Return, Arguments...>(name, m);
@@ -184,28 +181,9 @@ namespace cTVScript {
   };
 
   template<>
-  struct makeLoadableMethode<true, true>{
+  struct makeLoadableMethode<false>{
     template<typename Return, typename Object, typename... Arguments>
     static Loadable* get(const std::string&, Return (Object::*)(Arguments...)) {
-      static_assert(std::is_reference<Return>::value == true, "[cTVScript error] Loadable Methode can't return a reference value");
-      return NULL;
-    }
-  };
-
-  template<>
-  struct makeLoadableMethode<false, false>{
-    template<typename Return, typename Object, typename... Arguments>
-    static Loadable* get(const std::string&, Return (Object::*)(Arguments...)) {
-      static_assert(SFINAE::is_Loadable<Object*>::value == true, "[cTVScript error] Loadable Methode class have to herite from Loadable");
-      return NULL;
-    }
-  };
-
-  template<>
-  struct makeLoadableMethode<true, false>{
-    template<typename Return, typename Object, typename... Arguments>
-    static Loadable* get(const std::string&, Return (Object::*)(Arguments...)) {
-      static_assert(std::is_reference<Return>::value == true, "[cTVScript error] Loadable Methode can't return a reference value");
       static_assert(SFINAE::is_Loadable<Object*>::value == true, "[cTVScript error] Loadable Methode class have to herite from Loadable");
       return NULL;
     }
@@ -213,29 +191,12 @@ namespace cTVScript {
 
   template<typename Return, typename Object, typename... Arguments>
   Loadable* makeMethodeLoadable(const std::string& name, Return (Object::*m)(Arguments...)) {
-    return makeLoadableMethode<std::is_reference<Return>::value, SFINAE::is_Loadable<Object*>::value >::get(name, m);
+    return makeLoadableMethode<SFINAE::is_Loadable<Object*>::value >::get(name, m);
   }
-
-
-
-  template<typename Return, typename... Arguments>
-  struct makeLoadableFunction{
-    static Loadable* get(const std::string& name, Return (*m)(Arguments...)) {
-      return new StaticLoadableFunction<Return, Arguments...>(name, m);
-    }
-  };
-
-  template<typename Return, typename... Arguments>
-  struct makeLoadableFunction<Return&, Arguments...>{
-    static Loadable* get(const std::string&, Return& (*)(Arguments...)) {
-      static_assert(std::is_reference<Return>::value == true, "[cTVScript error] Loadable Methode can't return a reference value");
-      return NULL;
-    }
-  };
 
   template<typename Return, typename... Arguments>
   Loadable* makeFunctionLoadable(const std::string& name, Return (*m)(Arguments...)) {
-    return makeLoadableFunction<Return, Arguments...>::get(name, m);
+    return new StaticLoadableFunction<Return, Arguments...>(name, m);
   }
 };
 

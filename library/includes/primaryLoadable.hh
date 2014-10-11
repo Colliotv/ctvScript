@@ -14,19 +14,18 @@
 namespace cTVScript {
 
   class stringLoadable : public Loadable {
-  private:
-    std::string value;
+    DEFAULT_VALUE_DATA(std::string);
+    MAKE_CONVERTER(std::string,);
 
   public:
     DEFAULT_VALUE_CONSTRUCTOR(stringLoadable, std::string, "");
     DEFAULT_LOCK_USE(std::string);
     DEFAULT_VALUE_GETTER();
 
-    COMPARAND_OPERATOR(==,);
+    COMPARAND_OPERATOR(==);
 
-    ASSIGN_OPERATOR(, stringLoadable);
+    ASSIGN_OPERATOR(stringLoadable);
   };
-
 
   template<typename type, typename isFloating = void>
   class primaryLoadable;
@@ -36,8 +35,8 @@ namespace cTVScript {
 			typename std::enable_if<std::is_floating_point<type>
 						::value>::type>
     : public Loadable {
-  private:
-    type	value;
+    DEFAULT_VALUE_DATA(type);
+    MAKE_CONVERTER(type, Helper::FromString<type>);
 
   public:
     DEFAULT_VALUE_CONSTRUCTOR(primaryLoadable, type, 0);
@@ -45,34 +44,34 @@ namespace cTVScript {
     DEFAULT_VALUE_GETTER(std::to_string);
 
   public:
-    COMPARAND_OPERATOR(==, Helper::FromString<type>);
-    COMPARAND_OPERATOR(< , Helper::FromString<type>);
-    COMPARAND_OPERATOR(> , Helper::FromString<type>);
-    COMPARAND_OPERATOR(<=, Helper::FromString<type>);
-    COMPARAND_OPERATOR(>=, Helper::FromString<type>);
+    COMPARAND_OPERATOR(==);
+    COMPARAND_OPERATOR(< );
+    COMPARAND_OPERATOR(> );
+    COMPARAND_OPERATOR(<=);
+    COMPARAND_OPERATOR(>=);
 
-    ASSIGN_OPERATOR(Helper::FromString<type>, primaryLoadable<type>);
+    ASSIGN_OPERATOR(primaryLoadable<type>);
 
-    MATHEMATICAL_OPERATOR(+, Helper::FromString<type>, primaryLoadable<type>);
-    MATHEMATICAL_OPERATOR(*, Helper::FromString<type>, primaryLoadable<type>);
+    MATHEMATICAL_OPERATOR(+, primaryLoadable<type>);
+    MATHEMATICAL_OPERATOR(*, primaryLoadable<type>);
 
     MATHEMATICAL_WITH_REVERT_OPERATOR
-    (/, Helper::FromString<type>, primaryLoadable<type>, invertDiv);
+    (/, primaryLoadable<type>, invertDiv);
     MATHEMATICAL_WITH_REVERT_OPERATOR
-    (-, Helper::FromString<type>, primaryLoadable<type>, invertSub);
+    (-, primaryLoadable<type>, invertSub);
 
     MATHEMATICAL_REVERT_OPERATOR
-    (/, Helper::FromString<type>, primaryLoadable<type>, invertDiv);
+    (/, primaryLoadable<type>, invertDiv);
     MATHEMATICAL_REVERT_OPERATOR
-    (-, Helper::FromString<type>, primaryLoadable<type>, invertSub);    
+    (-, primaryLoadable<type>, invertSub);    
   };
 
   template<typename type>
   class primaryLoadable<type,
 			typename std::enable_if<std::is_integral<type>::value>::type>
     : public Loadable {
-  private:
-    type&	value;
+    DEFAULT_VALUE_DATA(type);
+    MAKE_CONVERTER(type, Helper::FromString<type>);
 
   public:
     DEFAULT_VALUE_CONSTRUCTOR(primaryLoadable, type, 0);
@@ -80,30 +79,30 @@ namespace cTVScript {
     DEFAULT_VALUE_GETTER(std::to_string);
 
   public:
-    COMPARAND_OPERATOR(==, Helper::FromString<type>);
-    COMPARAND_OPERATOR(< , Helper::FromString<type>);
-    COMPARAND_OPERATOR(> , Helper::FromString<type>);
-    COMPARAND_OPERATOR(<=, Helper::FromString<type>);
-    COMPARAND_OPERATOR(>=, Helper::FromString<type>);
+    COMPARAND_OPERATOR(==);
+    COMPARAND_OPERATOR(< );
+    COMPARAND_OPERATOR(> );
+    COMPARAND_OPERATOR(<=);
+    COMPARAND_OPERATOR(>=);
 
-    ASSIGN_OPERATOR(Helper::FromString<type>, primaryLoadable<type>);
+    ASSIGN_OPERATOR(primaryLoadable<type>);
 
-    MATHEMATICAL_OPERATOR(+, Helper::FromString<type>, primaryLoadable<type>);
-    MATHEMATICAL_OPERATOR(*, Helper::FromString<type>, primaryLoadable<type>);
+    MATHEMATICAL_OPERATOR(+, primaryLoadable<type>);
+    MATHEMATICAL_OPERATOR(*, primaryLoadable<type>);
 
     MATHEMATICAL_WITH_REVERT_OPERATOR
-    (/, Helper::FromString<type>, primaryLoadable<type>, invertDiv);
+    (/, primaryLoadable<type>, invertDiv);
     MATHEMATICAL_WITH_REVERT_OPERATOR
-    (%, Helper::FromString<type>, primaryLoadable<type>, invertMod);
+    (%, primaryLoadable<type>, invertMod);
     MATHEMATICAL_WITH_REVERT_OPERATOR
-    (-, Helper::FromString<type>, primaryLoadable<type>, invertSub);
+    (-, primaryLoadable<type>, invertSub);
 
     MATHEMATICAL_REVERT_OPERATOR
-    (/, Helper::FromString<type>, primaryLoadable<type>, invertDiv);
+    (/, primaryLoadable<type>, invertDiv);
     MATHEMATICAL_REVERT_OPERATOR
-    (%, Helper::FromString<type>, primaryLoadable<type>, invertMod);
+    (%, primaryLoadable<type>, invertMod);
     MATHEMATICAL_REVERT_OPERATOR
-    (-, Helper::FromString<type>, primaryLoadable<type>, invertSub);
+    (-, primaryLoadable<type>, invertSub);
   };
 };
 

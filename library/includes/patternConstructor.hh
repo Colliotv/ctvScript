@@ -20,34 +20,48 @@ private:								\
  ~ __class_name__ () { __onDestroy__ }					\
 
 /* loadable Easier Class construction */
-# define COMPARAND_OPERATOR(__op__, __conv__)				\
+# define DEFAULT_VALUE_DATA(__type__)					\
+  protected:								\
+    typedef __type__ value_type;					\
+  protected:								\
+    __type__ value;							\
+
+# define MAKE_CONVERTER(__return_type__, __conv__)		\
+  protected:							\
+  static __return_type__ convert(const std::string& s) {	\
+    return ( __conv__ (s) );					\
+  }
+  
+# define COMPARAND_OPERATOR(__op__)					\
   virtual bool operator __op__ (const Loadable& oth) const {		\
     if (getPriority() > oth.getPriority())				\
       return (oth __op__ *this);					\
-    return (value __op__ __conv__ (oth.getAsString()));			\
+    return (value __op__ convert (oth.getAsString()));			\
   }
-# define ASSIGN_OPERATOR(__conv__, __type__)				\
+
+# define ASSIGN_OPERATOR(__type__)					\
   virtual Loadable* operator = (const Loadable& oth) {			\
     if (getPriority() > oth.getPriority())				\
       throw cTVScript::InvalidAction("=", oth.getName());		\
-    Surveyor::get()->update(this);					\
-    return ( new __type__ ("", value = __conv__ (oth.getAsString())) ); \
+    Key::create()->notify(this);					\
+    return ( new __type__ ("", value = convert (oth.getAsString())) );	\
   }
-# define MATHEMATICAL_OPERATOR(__op__, __conv__, __type__)		\
+
+# define MATHEMATICAL_OPERATOR(__op__, __type__)		\
   virtual Loadable* operator __op__ (const Loadable& oth) const {	\
     if(getPriority() > oth.getPriority())				\
       return (oth __op__ *this);					\
-    return ( new __type__ ("", value __op__ __conv__ (oth.getAsString())) ); \
+    return ( new __type__ ("", value __op__ convert (oth.getAsString())) ); \
   }
-# define MATHEMATICAL_WITH_REVERT_OPERATOR(__op__, __conv__, __type__, __revert__) \
+# define MATHEMATICAL_WITH_REVERT_OPERATOR(__op__, __type__, __revert__) \
   virtual Loadable* operator __op__ (const Loadable& oth) const {		\
     if(getPriority() > oth.getPriority())					\
       return (oth. __revert__ (*this));						\
-    return ( new __type__ ("", value __op__ __conv__ (oth.getAsString())) );	\
+    return ( new __type__ ("", value __op__ convert (oth.getAsString())) );	\
   }
-# define MATHEMATICAL_REVERT_OPERATOR(__op__, __conv__, __type__, __revert__)	\
+# define MATHEMATICAL_REVERT_OPERATOR(__op__, __type__, __revert__)	\
   virtual Loadable* __revert__ (const Loadable& oth) const {			\
-    return ( new __type__ ("", (__conv__ (oth.getAsString())) __op__ value));	\
+    return ( new __type__ ("", (convert (oth.getAsString())) __op__ value));	\
   }
 
 # define DEFAULT_CONSTRUCTOR(__class_type__)			\

@@ -19,6 +19,8 @@ TODO(" - Tertio ; Loader");
 #include "objectLoadable.hh"
 #include "primaryLoadable.hh"
 #include "functionsLoadable.hh"
+#include "LoadableReferenceWrapper.hh"
+
 
 TODO("undef all includes pre-empter")
 

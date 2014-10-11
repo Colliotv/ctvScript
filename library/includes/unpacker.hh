@@ -10,6 +10,7 @@
 
 #include "objectLoadable.hh"
 #include "primaryLoadable.hh"
+#include "LoadableReferenceWrapper.hh"
 
 namespace cTVScript{
   namespace Converter{
