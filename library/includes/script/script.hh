@@ -2,9 +2,7 @@
 # define Script_h__
 # define INCLUDED_FROM_SCRIPT
 
-# include "Loadable.hh"
-
-# include "patternConstructor.hh"
+# include "helper/patternConstructor.hh"
 
 namespace cTVScript {
   class script {
@@ -12,10 +10,10 @@ namespace cTVScript {
     MAKE_SINGLETON(script,,,);
 
   public:
-    class symbol { public: typedef int id; };
+#	include "script/symbol.hh"
 
   public:
-#   include "ScriptCallback.hh"
+#	include "script/callback.hh"
     static std::vector<callback*>& getCallback() {
       return (get()->callbackList);
     }

@@ -1,7 +1,7 @@
 #ifndef loadableSFINAE_h__
 # define loadableSFINAE_h__
 
-#include "Loadable.hh"
+//#include "loadable/loadable.hh"
 
 namespace cTVScript{
   namespace SFINAE{
@@ -12,7 +12,7 @@ namespace cTVScript{
     template<typename object>
     struct is_Loadable{
       template <typename UpObject>
-      static decltype(std::declval<Loadable*&>() = std::declval<UpObject>(), one())
+      static decltype(std::declval<loadable::Loadable*&>() = std::declval<UpObject>(), one())
 	test(int);
   
       template<typename>

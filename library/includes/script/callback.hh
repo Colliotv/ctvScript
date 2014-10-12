@@ -10,15 +10,15 @@ private:
     std::string	path;
 
   protected:
-    virtual bool matchValue(const Loadable* value) = 0;
+    virtual bool matchValue(const loadable::Loadable* value) = 0;
     ValueState(const std::string& _path) : ok(false), path(_path) {}
   public:
     virtual ~ValueState() {}
 
   public:
-    bool compPath(const Loadable* value) { return (value ? value->path == path : false); }
+    bool compPath(const loadable::Loadable* value) { return (value ? value->path == path : false); }
     bool isReady() { return (ok); }
-    bool isValueReady(const Loadable* value = NULL)
+    bool isValueReady(const loadable::Loadable* value = NULL)
     { return ((isReady()) ? true : (ok = matchValue(value))); }
   };
 
@@ -34,7 +34,7 @@ private:
     virtual ~SubValueState() {}
 
   protected:
-    virtual bool matchValue(const Loadable* loadable) {
+    virtual bool matchValue(const loadable::Loadable* loadable) {
       const __loadable_class_type__* class_wrap =
 	dynamic_cast< const __loadable_class_type__* > (loadable);
       return (class_wrap? class_wrap->getLockedValue() == value: false);
@@ -46,7 +46,7 @@ private:
   /*script::symbol*		symbol;*/
 
 public:
-  bool refreshValue(const Loadable* loadable) {
+  bool refreshValue(const loadable::Loadable* loadable) {
     bool isReady = true;
     for (auto state : associatedValue) {
       bool subReady =

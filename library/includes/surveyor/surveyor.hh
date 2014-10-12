@@ -7,10 +7,10 @@
 # include <map>
 
 # include "error.h"
-# include "patternConstructor.hh"
+# include "helper/patternConstructor.hh"
 
-# include "Loadable.hh"
-# include "Script.hh"
+# include "loadable/loadable.hh"
+# include "script/script.hh"
 
 namespace cTVScript {
 
@@ -22,7 +22,7 @@ namespace cTVScript {
     MAKE_SINGLETON(Surveyor,,,);
 
   public:
-    static void	update(const Loadable* loadable) {
+    static void	update(const loadable::Loadable* loadable) {
       std::vector< script::callback* >& callbackList = script::getCallback();
 
       for (auto callback : callbackList)

@@ -2,10 +2,9 @@
 # define Error_h__
 
 #include <stdexcept>
-
 #include <string>
 
-#include "helper.hh"
+#include "helper/helper.hh"
 
 namespace cTVScript{
   class InvalidAction : public std::exception{

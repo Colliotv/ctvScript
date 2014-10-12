@@ -4,24 +4,16 @@
 #define DO_PRAGMA(x) _Pragma (#x)
 #define TODO(x) DO_PRAGMA(message ("\nTODO - [" __FILE__ "]:" #x))
 
-
-#include "helper.hh"
-
 TODO("Loader, Surveyor, ScriptExecutor")
 TODO(" - Prio : Key and Surveyor")
 TODO(" - Secundo : ScriptExecutor")
 TODO(" - Tertio ; Loader");
 TODO(" - Whenever : make a little lift in the name (end the length><)")
 
-#include "Surveyor.hh"
-#include "Loader.hh"
-#include "Loadable.hh"
 
-#include "objectLoadable.hh"
-#include "primaryLoadable.hh"
-#include "functionsLoadable.hh"
-#include "LoadableReferenceWrapper.hh"
-#include "primaryArray.hh"
+#include "surveyor.h"
+#include "binary.h"
+#include "loadable.h"
 
 
 TODO("undef all includes pre-empter")

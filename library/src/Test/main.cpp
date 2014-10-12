@@ -18,9 +18,9 @@ int& f3(int, double, char*){
 }
 
 int main() {
-  auto fn1 = cTVScript::makeFunctionLoadable("f", &f1);
-  auto fn2 = cTVScript::makeFunctionLoadable("f", &f2);
-  auto fn3 = cTVScript::makeFunctionLoadable("f", &f3);
+  auto fn1 = cTVScript::loadable::loadFunction("f", &f1);
+  auto fn2 = cTVScript::loadable::loadFunction("f", &f2);
+  auto fn3 = cTVScript::loadable::loadFunction("f", &f3);
 
   delete fn1;
   delete fn2;
