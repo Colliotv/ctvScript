@@ -18,7 +18,7 @@ namespace cTVScript{
 
     template <typename arg>
     struct convertLoadableTo{ // int, double...etc
-      static arg transform(std::shared_ptr<Key>, loadable::Loadable* l) {
+      static arg transform(loadable::Loadable* l) {
 	loadable::arithmetic<arg>* _l =
 	  dynamic_cast< loadable::arithmetic<arg>* >(l);
 	if (!_l) {
@@ -32,12 +32,12 @@ namespace cTVScript{
 
     template <typename arg>
     struct convertLoadableTo<arg&>{ // int&, double&...etc
-      static arg& transform(std::shared_ptr<Key> key, loadable::Loadable* l) {
+      static arg& transform(loadable::Loadable* l) {
 	loadable::arithmetic<arg>* _l =
 	  dynamic_cast< loadable::arithmetic<arg>* >(l);
 	if (!_l)
 	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg&>(), l->getName());
-	return (_l->unlock(key));
+	return (_l->unlock());
       }
     };
 
@@ -46,7 +46,7 @@ namespace cTVScript{
 
     template<typename arg>
     struct partObj<arg, true>{// object*
-      static arg* specT(std::shared_ptr<Key> key, loadable::Loadable* l) {
+      static arg* specT(loadable::Loadable* l) {
 	arg* _l = dynamic_cast<arg*>(l);
 	if (!_l)
 	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
@@ -56,25 +56,25 @@ namespace cTVScript{
 
     template<typename arg> // primary[]
     struct partObj<arg, false> {
-      static arg* specT(std::shared_ptr<Key> key, loadable::Loadable* l) {
+      static arg* specT( loadable::Loadable* l) {
 	auto _l =
 	  dynamic_cast< loadable::array< arg >* >(l);
 	if (!_l)
 	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
-	return (_l->unlock(key));
+	return (_l->unlock());
       }
     };
 
     template <typename arg>
     struct convertLoadableTo< arg* >{ // object* || primary[]
-      static arg* transform(std::shared_ptr<Key> k, loadable::Loadable* l) {
-	return (partObj<arg, SFINAE::is_Loadable<arg>::value>::specT(k, l));
+      static arg* transform(loadable::Loadable* l) {
+	return (partObj<arg, SFINAE::is_Loadable<arg>::value>::specT(l));
       }
     };
 
     template <>
     struct convertLoadableTo<std::string>{ // std::string
-      static std::string transform(std::shared_ptr<Key>, loadable::Loadable* l) {
+      static std::string transform(loadable::Loadable* l) {
 	loadable::string* _l =
 	  dynamic_cast< loadable::string* >(l);
 	if (!_l)
@@ -85,12 +85,12 @@ namespace cTVScript{
 
     template <>
     struct convertLoadableTo<std::string&>{ // std::string&
-      static std::string& transform(std::shared_ptr<Key> key, loadable::Loadable* l) {
+      static std::string& transform( loadable::Loadable* l) {
 	loadable::string* _l =
 	  dynamic_cast< loadable::string* >(l);
 	if (!_l)
 	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string&>(), l->getName());
-	return (_l->unlock(key));
+	return (_l->unlock());
       }
     };
 
@@ -120,27 +120,25 @@ namespace cTVScript{
     template<unsigned int N>
     struct unfolder{
       template <typename ReturnType, typename... Arguments, typename ...final>
-      static ReturnType applyFunc(std::shared_ptr<Key> key,
-				  std::vector<loadable::Loadable*> parameters,
+      static ReturnType applyFunc(std::vector<loadable::Loadable*> parameters,
 				  ReturnType (*fn)(Arguments...),
 				  final&&... args) {
 	return (unfolder<N - 1>::applyFunc
-		(key, parameters, fn,
+		(parameters, fn,
 		 Converter::convertLoadableTo< typename parametersType<N - 1, Arguments...>::type >
-		 ::transform(key, parameters[N-1]),
+		 ::transform(parameters[N-1]),
 		 args...));
       }
 
       template <typename ReturnType, typename Object, typename... Arguments, typename ...final>
-      static ReturnType applyMethode(std::shared_ptr<Key> key,
-				     std::vector<loadable::Loadable*> parameters,
+      static ReturnType applyMethode(std::vector<loadable::Loadable*> parameters,
 				     Object*	_this,
 				     ReturnType (Object::*fn)(Arguments...),
 				     final&&... args) {
 	return (unfolder<N - 1>::applyMethode
-		(key, parameters, _this, fn,
+		(parameters, _this, fn,
 		 Converter::convertLoadableTo< typename parametersType<N - 1, Arguments...>::type >
-		 ::transform(key, parameters[N-1]),
+		 ::transform(parameters[N-1]),
 		 args...));
       }
     };
@@ -148,16 +146,14 @@ namespace cTVScript{
     template<>
     struct unfolder<0>{
       template <typename ReturnType, typename ...Arguments, typename ...final>
-      static ReturnType applyFunc(std::shared_ptr<Key>,
-				  std::vector<loadable::Loadable*>,
+      static ReturnType applyFunc(std::vector<loadable::Loadable*>,
 				  ReturnType (*fn)(Arguments...),
 				  final&&... args) {
 	return (fn( args... ));
       }
 
       template <typename ReturnType, typename Object, typename ...Arguments, typename ...final>
-      static ReturnType applyMethode(std::shared_ptr<Key>,
-				     std::vector<loadable::Loadable*>,
+      static ReturnType applyMethode(std::vector<loadable::Loadable*>,
 				     Object*	_this,
 				     ReturnType (Object::*fn)(Arguments...),
 				     final&&... args) {
@@ -167,18 +163,16 @@ namespace cTVScript{
 
 
     template <typename ReturnType, typename ...Arguments>
-    ReturnType applyFunction(std::shared_ptr<Key> key,
-			     std::vector<loadable::Loadable*> args,
+    ReturnType applyFunction(std::vector<loadable::Loadable*> args,
 			     ReturnType (*fn)(Arguments...)) {
-      return (unfolder<sizeof...(Arguments)>::applyFunc(key, args, fn));
+      return (unfolder<sizeof...(Arguments)>::applyFunc(args, fn));
     }
 
     template <typename Object, typename ReturnType, typename ...Arguments>
-    ReturnType applyMethode(std::shared_ptr<Key> key,
-			    std::vector<loadable::Loadable*> args,
+    ReturnType applyMethode(std::vector<loadable::Loadable*> args,
 			    Object* _this,
 			    ReturnType (Object::*fn)(Arguments...)) {
-      return (unfolder<sizeof...(Arguments)>::applyMethode(key, args, _this, fn));
+      return (unfolder<sizeof...(Arguments)>::applyMethode(args, _this, fn));
     }
 
   };

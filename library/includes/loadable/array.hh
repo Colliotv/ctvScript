@@ -30,8 +30,7 @@ namespace cTVScript {
 		::type (std::to_string(_off), _array[_off]));
       }
 
-      virtual __stored_type__* unlock(DestructibleKey key) {
-	key->notify(this);
+      virtual __stored_type__* unlock() {
 	return (_array);
       }
 

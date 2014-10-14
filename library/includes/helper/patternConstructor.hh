@@ -43,7 +43,6 @@ private:								\
   virtual Loadable* operator = (const Loadable& oth) {			\
     if (getPriority() > oth.getPriority())				\
       throw cTVScript::InvalidAction("=", oth.getName());		\
-    Key::create()->notify(this);					\
     return ( new __type__ ("", value = convert (oth.getAsString())) );	\
   }
 
@@ -77,8 +76,7 @@ private:								\
 
 # define DEFAULT_LOCK_USE(__type__)		\
   __type__   getLockedValue() { return value; }	\
-  __type__ & unlock(DestructibleKey& key) {	\
-    key->notify(this);				\
+  __type__ & unlock() {				\
     return value ;				\
   }
 

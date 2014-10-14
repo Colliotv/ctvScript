@@ -22,6 +22,16 @@ namespace cTVScript{
       static constexpr bool value = sizeof(test<object>(0)) == sizeof(one);
     };
 
+    template<typename probableArray>
+    struct is_container {
+      template<typename _o>
+      static auto test(int) -> decltype(std::declval<_o>[0], one());
+
+      static two test(...);
+    public:
+      static constexpr bool value = sizeof(test<probableArray>(0)) == sizeof(one);
+    };
+
   };
 };
 

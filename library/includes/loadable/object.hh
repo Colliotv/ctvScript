@@ -4,13 +4,13 @@
 #ifndef ObjectLoadable_h__
 # define ObjectLoadable_h__
 
+# include <map>
 # include <algorithm>
 
 # include "status.h"
-# include "../helper/patternConstructor.hh"
+# include "helper/patternConstructor.hh"
 
-# include "./loadable.hh"
-# include "../surveyor/key.hh"
+# include "loadable/loadable.hh"
 
 namespace cTVScript{
 

@@ -1,8 +1,6 @@
 #ifndef  LoadableReferenceWrapper_h__
 # define LoadableReferenceWrapper_h__
 
-#include "surveyor/key.hh"
-
 namespace cTVScript {
 
   namespace loadable {
@@ -19,7 +17,6 @@ namespace cTVScript {
       virtual Loadable* operator = (const Loadable& oth) {			
 	if (__loadable__ :: getPriority() > oth.getPriority())
 	  throw cTVScript::InvalidAction("=", oth.getName());
-	Key::create()->notify(this);
 	return ( new __loadable__ ("",
 				   __loadable__ :: value =
 				   valueReference = 

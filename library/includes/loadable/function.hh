@@ -48,9 +48,8 @@ namespace cTVScript {
 	else
 	  throw cTVScript::TooManyParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
 
-	DestructibleKey key = Key::create();
 	pack._return = new typename Helper::DeduceLoadableType<Return>::type ("return",
-									      Unpacker::applyFunction(key, pack._arguments, fn));
+									      Unpacker::applyFunction(pack._arguments, fn));
       }
       function(const std::string& name,
 			     Return (*_fn)(Arguments...))
@@ -68,8 +67,7 @@ namespace cTVScript {
 	else
 	  throw cTVScript::TooManyParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
 
-	DestructibleKey key = Key::create();
-	pack._return = dynamic_cast<Loadable*> (Unpacker::applyFunction(key, pack._arguments, fn));
+	pack._return = dynamic_cast<Loadable*> (Unpacker::applyFunction(pack._arguments, fn));
       }
       function(const std::string& name,
 			     Return* (*_fn)(Arguments...))
@@ -104,9 +102,8 @@ namespace cTVScript {
 	else
 	  throw cTVScript::TooManyParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
 	Object* _this = dynamic_cast<Object*> (pack._this);
-	DestructibleKey key = Key::create();
 	pack._return = new typename Helper::DeduceLoadableType<Return>::type ("return",
-									      Unpacker::applyMethode(key, pack._arguments, _this, fn));
+									      Unpacker::applyMethode(pack._arguments, _this, fn));
       }
       methode(const std::string& name, Return (Object::*_fn)(Arguments...))
 	: abstractFunction(name), fn(_fn){}
@@ -123,8 +120,7 @@ namespace cTVScript {
 	else
 	  throw cTVScript::TooManyParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
 	Object* _this = dynamic_cast<Object*> (pack._this);
-	DestructibleKey key = Key::create();
-	pack._return = dynamic_cast<Loadable*> (Unpacker::applyMethode(key, pack._arguments, _this, fn));
+	pack._return = dynamic_cast<Loadable*> (Unpacker::applyMethode(pack._arguments, _this, fn));
       }
       methode(const std::string& name, Return* (Object::*_fn)(Arguments...))
 	: abstractFunction(name), fn(_fn){}
@@ -141,8 +137,7 @@ namespace cTVScript {
 	else
 	  throw cTVScript::TooManyParameters(Helper::getTypeName<void (Object::*)(Arguments...)>(), this->name);
 	Object* _this = dynamic_cast<Object*> (pack._this);
-	DestructibleKey key = Key::create();
-	Unpacker::applyMethode(key, pack._arguments, _this, fn);
+	Unpacker::applyMethode(pack._arguments, _this, fn);
       }
       methode(const std::string& name, void (Object::*_fn)(Arguments...))
 	: abstractFunction(name), fn(_fn){}

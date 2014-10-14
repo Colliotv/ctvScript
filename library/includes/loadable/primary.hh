@@ -10,8 +10,6 @@
 
 #include "loadable/loadable.hh"
 
-#include "surveyor/key.hh"
-
 namespace cTVScript {
 
   namespace loadable{

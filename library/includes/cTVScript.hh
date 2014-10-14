@@ -11,7 +11,6 @@ TODO(" - Tertio ; Loader");
 TODO(" - Whenever : make a little lift in the name (end the length><)")
 
 
-#include "surveyor.h"
 #include "binary.h"
 #include "loadable.h"
 
