@@ -23,8 +23,8 @@ namespace cTVScript{
 	  dynamic_cast< loadable::arithmetic<arg>* >(l);
 	if (!_l) {
 	  try { return (Helper::FromString<arg>(l->getAsString())); }
-	  catch (std::invalid_argument) { throw cTVScript::InvalidParameter(Helper::getTypeName<arg>(), l->getName()); }
-	  catch (std::out_of_range) { throw cTVScript::InvalidParameter(Helper::getTypeName<arg>(), l->getName()); }
+	  catch (std::invalid_argument) { throw cTVScript::exception::InvalidParameter(Helper::getTypeName<arg>(), l->getName()); }
+	  catch (std::out_of_range) { throw cTVScript::exception::InvalidParameter(Helper::getTypeName<arg>(), l->getName()); }
 	}
 	return (_l->getLockedValue());
       }
@@ -36,7 +36,7 @@ namespace cTVScript{
 	loadable::arithmetic<arg>* _l =
 	  dynamic_cast< loadable::arithmetic<arg>* >(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg&>(), l->getName());
+	  throw cTVScript::exception::InvalidParameter(Helper::getTypeName<arg&>(), l->getName());
 	return (_l->unlock());
       }
     };
@@ -49,7 +49,7 @@ namespace cTVScript{
       static arg* specT(loadable::Loadable* l) {
 	arg* _l = dynamic_cast<arg*>(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
+	  throw cTVScript::exception::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
 	return (_l);
       }
     };
@@ -60,7 +60,7 @@ namespace cTVScript{
 	auto _l =
 	  dynamic_cast< loadable::array< arg >* >(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
+	  throw cTVScript::exception::InvalidParameter(Helper::getTypeName<arg*>(), l->getName());
 	return (_l->unlock());
       }
     };
@@ -78,7 +78,7 @@ namespace cTVScript{
 	loadable::string* _l =
 	  dynamic_cast< loadable::string* >(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string>(), l->getName());
+	  throw cTVScript::exception::InvalidParameter(Helper::getTypeName<std::string>(), l->getName());
 	return (_l->getLockedValue());
       }
     };
@@ -89,7 +89,7 @@ namespace cTVScript{
 	loadable::string* _l =
 	  dynamic_cast< loadable::string* >(l);
 	if (!_l)
-	  throw cTVScript::InvalidParameter(Helper::getTypeName<std::string&>(), l->getName());
+	  throw cTVScript::exception::InvalidParameter(Helper::getTypeName<std::string&>(), l->getName());
 	return (_l->unlock());
       }
     };

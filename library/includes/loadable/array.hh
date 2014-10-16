@@ -10,6 +10,11 @@ namespace cTVScript {
 
   namespace loadable {
 
+    template<typename __stored_type__, typename __container__>
+    class container : public {
+      __container__& _container;
+    };
+
     template <typename __stored_type__>
     class array : public Loadable {
       __stored_type__*	_array;

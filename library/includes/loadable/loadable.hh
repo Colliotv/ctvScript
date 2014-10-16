@@ -10,7 +10,7 @@
 # include <memory>
 # include <vector>
 
-# include "error.h"
+# include "exception/exception.hh"
 
 namespace cTVScript {
 
@@ -68,29 +68,29 @@ namespace cTVScript {
     public:
       virtual const std::string getAsString() const = 0;
  
-      virtual bool operator==(const Loadable&) const	{throw cTVScript::InvalidAction("==",	this->name);}
-      virtual bool operator< (const Loadable&) const	{throw cTVScript::InvalidAction("<",	this->name);}
-      virtual bool operator> (const Loadable&) const	{throw cTVScript::InvalidAction(">",	this->name);}
-      virtual bool operator>=(const Loadable&) const	{throw cTVScript::InvalidAction(">=",	this->name);}
-      virtual bool operator<=(const Loadable&) const	{throw cTVScript::InvalidAction("<=",	this->name);}
+      virtual bool operator==(const Loadable&) const	{throw cTVScript::exception::InvalidAction("==",	this->name);}
+      virtual bool operator< (const Loadable&) const	{throw cTVScript::exception::InvalidAction("<",	this->name);}
+      virtual bool operator> (const Loadable&) const	{throw cTVScript::exception::InvalidAction(">",	this->name);}
+      virtual bool operator>=(const Loadable&) const	{throw cTVScript::exception::InvalidAction(">=",	this->name);}
+      virtual bool operator<=(const Loadable&) const	{throw cTVScript::exception::InvalidAction("<=",	this->name);}
 
-      virtual Loadable* operator=(const Loadable&)	{throw cTVScript::InvalidAction("=",	this->name);}
+      virtual Loadable* operator=(const Loadable&)	{throw cTVScript::exception::InvalidAction("=",	this->name);}
 
-      virtual Loadable* operator+(const Loadable&) const	{throw cTVScript::InvalidAction("+",	this->name);}
-      virtual Loadable* operator*(const Loadable&) const	{throw cTVScript::InvalidAction("*",	this->name);}
+      virtual Loadable* operator+(const Loadable&) const	{throw cTVScript::exception::InvalidAction("+",	this->name);}
+      virtual Loadable* operator*(const Loadable&) const	{throw cTVScript::exception::InvalidAction("*",	this->name);}
 
-      virtual Loadable* operator-(const Loadable&) const	{throw cTVScript::InvalidAction("-",	this->name);}
-      virtual Loadable* invertSub(const Loadable&) const	{throw cTVScript::InvalidAction("/",	this->name);}
-      virtual Loadable* operator/(const Loadable&) const	{throw cTVScript::InvalidAction("/",	this->name);}
-      virtual Loadable* invertDiv(const Loadable&) const	{throw cTVScript::InvalidAction("/",	this->name);}
-      virtual Loadable* operator%(const Loadable&) const	{throw cTVScript::InvalidAction("%",	this->name);}
-      virtual Loadable* invertMod(const Loadable&) const	{throw cTVScript::InvalidAction("%",	this->name);}
+      virtual Loadable* operator-(const Loadable&) const	{throw cTVScript::exception::InvalidAction("-",	this->name);}
+      virtual Loadable* invertSub(const Loadable&) const	{throw cTVScript::exception::InvalidAction("/",	this->name);}
+      virtual Loadable* operator/(const Loadable&) const	{throw cTVScript::exception::InvalidAction("/",	this->name);}
+      virtual Loadable* invertDiv(const Loadable&) const	{throw cTVScript::exception::InvalidAction("/",	this->name);}
+      virtual Loadable* operator%(const Loadable&) const	{throw cTVScript::exception::InvalidAction("%",	this->name);}
+      virtual Loadable* invertMod(const Loadable&) const	{throw cTVScript::exception::InvalidAction("%",	this->name);}
 
-      virtual Loadable* operator[](const std::string&)	{throw cTVScript::InvalidAction("[]",	this->name);}
+      virtual Loadable* operator[](const std::string&)	{throw cTVScript::exception::InvalidAction("[]",	this->name);}
 
-      virtual Loadable* operator[](size_t)		{throw cTVScript::InvalidAction("[]",	this->name);}
+      virtual Loadable* operator[](size_t)		{throw cTVScript::exception::InvalidAction("[]",	this->name);}
 
-      virtual void      operator()(parametersPack&)	{throw cTVScript::InvalidAction("()",	this->name);}
+      virtual void      operator()(parametersPack&)	{throw cTVScript::exception::InvalidAction("()",	this->name);}
     };
 
   };

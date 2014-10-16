@@ -42,7 +42,7 @@ private:								\
 # define ASSIGN_OPERATOR(__type__)					\
   virtual Loadable* operator = (const Loadable& oth) {			\
     if (getPriority() > oth.getPriority())				\
-      throw cTVScript::InvalidAction("=", oth.getName());		\
+      throw cTVScript::exception::InvalidAction("=", oth.getName());		\
     return ( new __type__ ("", value = convert (oth.getAsString())) );	\
   }
 
@@ -86,7 +86,7 @@ private:								\
   }
 # define NEGATE_VALUE_GETTER()				\
   const std::string	getAsString() const {		\
-    throw cTVScript::unSerialized(getName());		\
+    throw cTVScript::exception::unSerialized(getName());		\
     return ("");					\
   }
 

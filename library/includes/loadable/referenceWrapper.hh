@@ -16,7 +16,7 @@ namespace cTVScript {
     public:
       virtual Loadable* operator = (const Loadable& oth) {			
 	if (__loadable__ :: getPriority() > oth.getPriority())
-	  throw cTVScript::InvalidAction("=", oth.getName());
+	  throw cTVScript::exception::InvalidAction("=", oth.getName());
 	return ( new __loadable__ ("",
 				   __loadable__ :: value =
 				   valueReference = 

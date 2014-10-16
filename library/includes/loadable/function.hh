@@ -44,9 +44,9 @@ namespace cTVScript {
     public:
       virtual void call(cTVScript::parametersPack& pack) {
 	if (pack._arguments.size() < sizeof...(Arguments))
-	  throw cTVScript::MissingParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::MissingParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
 	else
-	  throw cTVScript::TooManyParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::TooManyParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
 
 	pack._return = new typename Helper::DeduceLoadableType<Return>::type ("return",
 									      Unpacker::applyFunction(pack._arguments, fn));
@@ -63,9 +63,9 @@ namespace cTVScript {
     public:
       virtual void call(cTVScript::parametersPack& pack) {
 	if (pack._arguments.size() < sizeof...(Arguments))
-	  throw cTVScript::MissingParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::MissingParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
 	else
-	  throw cTVScript::TooManyParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::TooManyParameters(Helper::getTypeName<Return (*)(Arguments...)>(), this->name);
 
 	pack._return = dynamic_cast<Loadable*> (Unpacker::applyFunction(pack._arguments, fn));
       }
@@ -81,9 +81,9 @@ namespace cTVScript {
     public:
       virtual void call(cTVScript::parametersPack& pack) {
 	if (pack._arguments.size() < sizeof...(Arguments))
-	  throw cTVScript::MissingParameters(Helper::getTypeName<void (*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::MissingParameters(Helper::getTypeName<void (*)(Arguments...)>(), this->name);
 	else
-	  throw cTVScript::TooManyParameters(Helper::getTypeName<void (*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::TooManyParameters(Helper::getTypeName<void (*)(Arguments...)>(), this->name);
 	Unpacker::applyFunction(pack._arguments, fn);
       }
       function(const std::string& name,
@@ -98,9 +98,9 @@ namespace cTVScript {
     public:
       virtual void call(cTVScript::parametersPack& pack) {
 	if (pack._arguments.size() < sizeof...(Arguments))
-	  throw cTVScript::MissingParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::MissingParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
 	else
-	  throw cTVScript::TooManyParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::TooManyParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
 	Object* _this = dynamic_cast<Object*> (pack._this);
 	pack._return = new typename Helper::DeduceLoadableType<Return>::type ("return",
 									      Unpacker::applyMethode(pack._arguments, _this, fn));
@@ -116,9 +116,9 @@ namespace cTVScript {
     public:
       virtual void call(cTVScript::parametersPack& pack) {
 	if (pack._arguments.size() < sizeof...(Arguments))
-	  throw cTVScript::MissingParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::MissingParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
 	else
-	  throw cTVScript::TooManyParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::TooManyParameters(Helper::getTypeName<Return (Object::*)(Arguments...)>(), this->name);
 	Object* _this = dynamic_cast<Object*> (pack._this);
 	pack._return = dynamic_cast<Loadable*> (Unpacker::applyMethode(pack._arguments, _this, fn));
       }
@@ -133,9 +133,9 @@ namespace cTVScript {
     public:
       virtual void call(cTVScript::parametersPack& pack) {
 	if (pack._arguments.size() < sizeof...(Arguments))
-	  throw cTVScript::MissingParameters(Helper::getTypeName<void (Object::*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::MissingParameters(Helper::getTypeName<void (Object::*)(Arguments...)>(), this->name);
 	else
-	  throw cTVScript::TooManyParameters(Helper::getTypeName<void (Object::*)(Arguments...)>(), this->name);
+	  throw cTVScript::exception::TooManyParameters(Helper::getTypeName<void (Object::*)(Arguments...)>(), this->name);
 	Object* _this = dynamic_cast<Object*> (pack._this);
 	Unpacker::applyMethode(pack._arguments, _this, fn);
       }
