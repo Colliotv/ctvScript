@@ -383,10 +383,15 @@ namespace ctvscript{
 	SkipWhiteSpace();
 	
       }
-      /* Decl
+
+      /* Var
        * Variable Declaration
        */
-
+      bool Var() {
+	if (!KeyWord("var"))
+	  return (false);
+	return (true);
+      }
 
       /* Def
        * Function Or Method
@@ -395,7 +400,7 @@ namespace ctvscript{
 	if (!KeyWord("def"))
 	  return false;
 	const architecture::type::info* _type = Type();
-
+	return (true);
       }
 
 
