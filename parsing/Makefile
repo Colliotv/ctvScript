@@ -8,9 +8,6 @@ INC	= -I ./includes
 ########################
 #### MAIN
 MAIN	= src/first.cpp
-### ARCHI
-ARCHI_D	= src/architecture/
-ARCHI	= $(ARCHI_D)line.cpp
 ########################
 SRC	=  $(MAIN) $(ARCHI)
 
