@@ -11,7 +11,7 @@ MAIN	= src/first.cpp
 ########################
 SRC	=  $(MAIN) $(ARCHI)
 
-FLAGS	= -W -Wall -Wextra $(INC) -std=c++0x
+FLAGS	= -W -Wall -Wextra $(INC) -std=c++11
 
 CFLAGS		+= $(FLAGS)
 LDFLAGS		= 
