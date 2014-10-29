@@ -27,6 +27,13 @@ namespace ctvscript {
       return ss.str();
     }
 
+    static std::string
+    format_type(const char* t_type) {
+      std::stringstream ss;
+      ss << "{ " << t_type << " }";
+      return (ss.str());
+    }
+
     /* error format */
     static std::string
     format(const std::string &t_why,
@@ -34,6 +41,16 @@ namespace ctvscript {
       std::stringstream ss;
 
       ss << format_why(t_why) << " " << format_location(t_where);;
+      return (ss.str());
+    }
+
+    static std::string
+    format(const std::string &t_why,
+	   const cursor_position &t_where,
+	   const char* t_type) {
+      std::stringstream ss;
+
+      ss << format_why(t_why) << " " << format_type(t_type) << " " << format_location(t_where);
       return (ss.str());
     }
 
@@ -47,6 +64,11 @@ namespace ctvscript {
 
       parse_error(std::string t_cause, const parser::cursor_position& t_where)
 	: std::runtime_error(parser::format(t_cause, t_where)),
+	  cause(t_cause), start_position(t_where)
+      {}
+
+      parse_error(std::string t_cause, const parser::cursor_position& t_where, const char* t_type)
+	: std::runtime_error(parser::format(t_cause, t_where, t_type)),
 	  cause(t_cause), start_position(t_where)
       {}
     };

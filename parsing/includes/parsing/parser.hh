@@ -36,6 +36,7 @@ namespace ctvscript{
 	,   hex_alphabet
 	,   b_alphabet
 	,   bin_alphabet
+	,   type_alphabet
 	,   id_alphabet
 	,   white_alphabet
 	,   int_suffix_alphabet
@@ -202,6 +203,11 @@ namespace ctvscript{
         m_alphabet[detail::b_alphabet][static_cast<int>('b')]=true;
         m_alphabet[detail::b_alphabet][static_cast<int>('B')]=true;
 
+        for ( int c = 'a' ; c <= 'z' ; ++c ) { m_alphabet[detail::type_alphabet][c]=true; }
+        for ( int c = 'A' ; c <= 'Z' ; ++c ) { m_alphabet[detail::type_alphabet][c]=true; }
+        for ( int c = '0' ; c <= '9' ; ++c ) { m_alphabet[detail::type_alphabet][c]=true; }
+        m_alphabet[detail::type_alphabet][static_cast<int>('_')]=true;
+
         for ( int c = 'a' ; c <= 'z' ; ++c ) { m_alphabet[detail::id_alphabet][c]=true; }
         for ( int c = 'A' ; c <= 'Z' ; ++c ) { m_alphabet[detail::id_alphabet][c]=true; }
         m_alphabet[detail::id_alphabet][static_cast<int>('_')] = true;
@@ -225,6 +231,14 @@ namespace ctvscript{
 	return m_alphabet[t_d][t_c];
       };
 
+      bool check_word_in_alphabet(const char* t_word, detail::alphabet t_d) {
+	size_t size = strlen(t_word);
+
+	for (size_t i = 0; i < size; i++)
+	  if (!check_in_alphabet(t_word[i], t_d))
+	    return (false);
+	return (true);
+      }
 
 
       bool has_more_input() {
@@ -351,7 +365,16 @@ namespace ctvscript{
 	return (Char_(t_char));
       }
 
-
+      std::string cutFollowingWord(detail::alphabet t_d) {
+	SkipWhiteSpace();
+	if (!has_more_input())
+	  return (NULL);
+	std::string::const_iterator last = m_input_pos;
+	while (has_more_input && check_in_alphabet(*m_input_pos, t_d)) {
+	  ++m_input_pos;
+	}
+	return (std::string(last, m_input_pos));
+      }
 
 
       bool BlockEnd_() {
@@ -376,12 +399,41 @@ namespace ctvscript{
       };
 
       /* Types
+       *  Suffixs
+       */
+      architecture::type::info*
+      Type_Suffix_(architecture::type::info*) {
+      }
+
+      architecture::type::info*
+      Type_Suffix(architecture::type::info* t_type_info) {
+	SkipWhiteSpace();
+	return (Type_Suffix_(t_type_info));
+      }      
+
+      /* Types
        *
        */
-      const architecture::type::info*
+      architecture::type::info*
+      Type_() {
+	const char*			potent_type = cutFollowingWord(detail::type_alphabet).c_str();
+	architecture::type::modifier	potent_modifier_type = architecture::type::modifier::none;
+	const architecture::type::info* type_info = NULL;
+
+	while ((type_info = architecture::type::getTypeInfo(potent_type)) == NULL) {
+	  if ((potent_modifier_type = architecture::type::getModifier(potent_type, potent_modifier_type))
+	      == architecture::type::modifier::none)
+	    throw exception::parse_error("Unknown Type", cursor_position(m_line, m_col), potent_type);	    
+	  potent_type = cutFollowingWord(detail::type_alphabet).c_str();
+	}
+
+	return (architecture::type::make_type(type_info, potent_modifier_type));
+      }
+
+      architecture::type::info*
       Type() {
 	SkipWhiteSpace();
-	
+	return (Type_());
       }
 
       /* Var
@@ -399,6 +451,9 @@ namespace ctvscript{
       bool Def() {
 	if (!KeyWord("def"))
 	  return false;
+	SkipWhiteSpace();
+	if (!has_more_input())
+	  throw exception::parse_error("Unended Function Declaration", cursor_position(m_line, m_col));
 	const architecture::type::info* _type = Type();
 	return (true);
       }
