@@ -28,7 +28,7 @@ namespace ctvscript {
     }
 
     static std::string
-    format_type(const char* t_type) {
+    format_type(const std::string& t_type) {
       std::stringstream ss;
       ss << "{ " << t_type << " }";
       return (ss.str());
@@ -47,7 +47,7 @@ namespace ctvscript {
     static std::string
     format(const std::string &t_why,
 	   const cursor_position &t_where,
-	   const char* t_type) {
+	   const std::string &t_type) {
       std::stringstream ss;
 
       ss << format_why(t_why) << " " << format_type(t_type) << " " << format_location(t_where);
@@ -57,20 +57,18 @@ namespace ctvscript {
   };
   namespace exception {
     struct parse_error : public std::runtime_error {
-      std::string cause;
+      std::string m_cause;
 
-      parser::cursor_position start_position;
-      parser::cursor_position end_position;
+      const parser::cursor_position m_where;
 
       parse_error(std::string t_cause, const parser::cursor_position& t_where)
-	: std::runtime_error(parser::format(t_cause, t_where)),
-	  cause(t_cause), start_position(t_where)
+	: std::runtime_error(parser::format(t_cause, t_where)), m_cause(parser::format(t_cause, t_where)), m_where(t_where)
       {}
 
-      parse_error(std::string t_cause, const parser::cursor_position& t_where, const char* t_type)
-	: std::runtime_error(parser::format(t_cause, t_where, t_type)),
-	  cause(t_cause), start_position(t_where)
+      parse_error(std::string t_cause, const parser::cursor_position& t_where, std::string t_type)
+	: std::runtime_error(parser::format(t_cause, t_where, t_type)), m_cause(parser::format(t_cause, t_where, t_type)), m_where(t_where)
       {}
+
     };
   };
 };

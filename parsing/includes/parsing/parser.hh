@@ -5,8 +5,9 @@
 # include <string.h>
 
 //Cpp includes
+# include <iostream>
 # include <string>
-# include <vector>
+# include <list>
 # include <map>
 
 
@@ -29,6 +30,7 @@ namespace ctvscript{
     namespace detail {
       enum alphabet {
 	symbol_alphabet = 0
+	,   any_alphabet
         ,   keyword_alphabet
 	,   int_alphabet
 	,   float_alphabet
@@ -42,6 +44,7 @@ namespace ctvscript{
 	,   int_suffix_alphabet
 	,   float_suffix_alphabet
 	,   nline_alphabet
+	,   pointeur_alphabet
 	,   max_alphabet
 	,   lengthof_alphabet = 256
       };
@@ -50,14 +53,38 @@ namespace ctvscript{
     class language_parser{
     private:
 
-      std::string::const_iterator m_input_pos, m_input_end;
+      struct cursor_save {
+	language_parser* m_parser;
+	std::string::const_iterator m_it;
+	size_t m_line, m_col;
+	cursor_save(language_parser* t_parser)
+	  : m_parser(t_parser), m_it(t_parser->m_input_pos),
+	    m_line(t_parser->m_line), m_col(t_parser->m_col) {}
+	void restore() {
+	  m_parser->m_input_pos = m_it;
+	  m_parser->m_line = m_line;
+	  m_parser->m_col = m_col;
+	  m_parser->m_line_beg = m_parser->m_input_pos;
+	  while (m_parser->m_line_beg != m_parser->m_input_beg &&
+		 !m_parser->check_in_alphabet(*(m_parser->m_line_beg),
+					      detail::nline_alphabet)) {
+	    --m_parser->m_line_beg;
+	  }
+	  m_parser->matchEndLine();
+	}
+
+      };
+      std::string::const_iterator m_input_beg, m_input_pos, m_input_end;
+      std::string::const_iterator m_line_beg, m_line_end;
+
       size_t m_line, m_col;
 
       /* should be moved to a dico class */
       std::string m_multiline_comment_begin, m_multiline_comment_end;
       std::string m_singleline_comment;
 
-      std::vector<architecture::node> m_current_context;
+      architecture::context_node*	m_superior_context;
+      std::list<architecture::node*>	m_current_context;
 
 
       bool m_alphabet [detail::max_alphabet][detail::lengthof_alphabet];
@@ -169,6 +196,7 @@ namespace ctvscript{
           for (auto & elem : m_alphabet) {
             elem[c]=false;
           }
+	  m_alphabet[detail::any_alphabet][c] = true;
         }
         m_alphabet[detail::symbol_alphabet][static_cast<int>('?')]=true;
         m_alphabet[detail::symbol_alphabet][static_cast<int>('+')]=true;
@@ -208,6 +236,11 @@ namespace ctvscript{
         for ( int c = '0' ; c <= '9' ; ++c ) { m_alphabet[detail::type_alphabet][c]=true; }
         m_alphabet[detail::type_alphabet][static_cast<int>('_')]=true;
 
+
+        m_alphabet[detail::pointeur_alphabet][static_cast<int>('*')]=true;
+        m_alphabet[detail::pointeur_alphabet][static_cast<int>('[')]=true;
+        m_alphabet[detail::pointeur_alphabet][static_cast<int>(']')]=true;
+
         for ( int c = 'a' ; c <= 'z' ; ++c ) { m_alphabet[detail::id_alphabet][c]=true; }
         for ( int c = 'A' ; c <= 'Z' ; ++c ) { m_alphabet[detail::id_alphabet][c]=true; }
         m_alphabet[detail::id_alphabet][static_cast<int>('_')] = true;
@@ -215,6 +248,10 @@ namespace ctvscript{
         m_alphabet[detail::white_alphabet][static_cast<int>(' ')]=true;
         m_alphabet[detail::white_alphabet][static_cast<int>('\t')]=true;
         m_alphabet[detail::nline_alphabet][static_cast<int>('\n')]=true;
+
+        m_alphabet[detail::any_alphabet][static_cast<int>(' ')]=false;
+        m_alphabet[detail::any_alphabet][static_cast<int>('\t')]=false;
+        m_alphabet[detail::any_alphabet][static_cast<int>('\n')]=false;
 
         m_alphabet[detail::int_suffix_alphabet][static_cast<int>('l')] = true;
         m_alphabet[detail::int_suffix_alphabet][static_cast<int>('L')] = true;
@@ -227,6 +264,13 @@ namespace ctvscript{
         m_alphabet[detail::float_suffix_alphabet][static_cast<int>('F')] = true;
       }
 
+      const std::list<architecture::node*>
+      cutContext(std::list< architecture::node* >::iterator t_split) {
+	std::list<architecture::node*> _tmp(t_split, m_current_context.end());
+	m_current_context.erase(t_split, m_current_context.end());
+	return (std::move(_tmp));
+      }
+	
       bool check_in_alphabet(unsigned char t_c, detail::alphabet t_d) {
 	return m_alphabet[t_d][t_c];
       };
@@ -245,7 +289,13 @@ namespace ctvscript{
 	return (m_input_pos != m_input_end);
       }
 
-
+      void matchEndLine() {
+	m_line_end = m_line_beg;
+	while (m_line_end != m_input_end
+	       && !check_in_alphabet(*m_line_end,
+				    detail::nline_alphabet))
+	  ++m_line_end;
+      }
 
       bool SkipComment() {
 	size_t col = m_col;
@@ -265,7 +315,25 @@ namespace ctvscript{
 	  if (!ended)
 	    throw exception::parse_error("Unended Multiline Comment",
 					 cursor_position(line, col));
+	  return (true);
 	}
+	else if (Symbol_(m_singleline_comment.c_str())) {
+	  while (has_more_input() &&
+		 !check_in_alphabet(*m_input_pos, detail::nline_alphabet)) {
+	    if (check_in_alphabet(*m_input_pos, detail::nline_alphabet)) {
+	      m_col = 0;
+	      ++m_line;
+	      ++m_input_pos;
+	      m_line_beg = m_input_pos;
+	      matchEndLine();
+	    } else {
+	      ++m_input_pos;
+	      ++m_col;
+	    }
+	  }
+	  return (true);
+	}
+	return (false);
       }
 
       void SkipWhiteSpace(bool skip_new_line = true) {
@@ -277,6 +345,8 @@ namespace ctvscript{
 	    m_col = 0;
 	    ++m_line;
 	    ++m_input_pos;
+	    m_line_beg = m_input_pos;
+	    matchEndLine();
 	  } else if (!SkipComment())
 	    return ;
 	} while (has_more_input());
@@ -305,15 +375,11 @@ namespace ctvscript{
       bool KeyWord(const char* t_keyword) {
 	SkipWhiteSpace();
 
-	size_t col = m_col;
-	size_t line = m_line;
-	std::string::const_iterator tmp = m_input_pos;
-	if (!KeyWord_(t_keyword))
-	  return (false);
-	m_col = col;
-	m_line = line;
-	m_input_pos = tmp;
-	return (true);
+	cursor_save _save(this);
+	if (KeyWord_(t_keyword))
+	  return (true);
+	_save.restore();
+	return (false);
       }
 
 
@@ -321,6 +387,7 @@ namespace ctvscript{
 
       bool Symbol_(const char* t_keyword) {
 	size_t len = strlen(t_keyword);
+
 	if ((m_input_end - m_input_pos) >=
 	    static_cast<std::make_signed<size_t>::type>(len)) {
 	  std::string::const_iterator tmp = m_input_pos;
@@ -340,15 +407,11 @@ namespace ctvscript{
       bool Symbol(const char* t_keyword) {
 	SkipWhiteSpace();
 
-	size_t col = m_col;
-	size_t line = m_line;
-	std::string::const_iterator tmp = m_input_pos;
-	if (!Symbol_(t_keyword))
-	  return (false);
-	m_col = col;
-	m_line = line;
-	m_input_pos = tmp;
-	return (true);
+	cursor_save _save(this);
+	if (Symbol_(t_keyword))
+	  return (true);
+	_save.restore();
+	return (false);
       }
 
       bool Char_(char t_char) {
@@ -370,8 +433,9 @@ namespace ctvscript{
 	if (!has_more_input())
 	  return (NULL);
 	std::string::const_iterator last = m_input_pos;
-	while (has_more_input && check_in_alphabet(*m_input_pos, t_d)) {
+	while (has_more_input() && check_in_alphabet(*m_input_pos, t_d)) {
 	  ++m_input_pos;
+	  ++m_col;
 	}
 	return (std::string(last, m_input_pos));
       }
@@ -384,10 +448,9 @@ namespace ctvscript{
 
       bool Eol_() {
 	bool retval = false;
-	if (*m_input_pos == '\n') {
+	if (*m_input_pos == ';') {
 	  retval = true;
-	  ++m_line;
-	  m_col = 0;
+	  ++m_col;
 	  ++m_input_pos;
 	}
 	return (retval);
@@ -396,19 +459,56 @@ namespace ctvscript{
       bool Eol() {
 	SkipWhiteSpace(false);
 	return (Eol_());
-      };
+      }
 
       /* Types
        *  Suffixs
        */
       architecture::type::info*
-      Type_Suffix_(architecture::type::info*) {
+      Type_Suffix_(architecture::type::info* t_type, bool t_pointeur = true) {
+	while (has_more_input()) {
+	  SkipWhiteSpace();
+	  std::list<architecture::node*>::iterator currentContext = m_current_context.end();
+	  if (t_pointeur && Char('*')) {
+	    t_type = architecture::type::make_pointeur(t_type);
+	  } else if (t_pointeur && ParametersList(false)) {
+	    architecture::type::callable_info* t_function_type
+	      = architecture::type::make_callable(t_type);
+	    for (std::list<architecture::node*>::iterator tmp = currentContext;
+		 tmp != m_current_context.end(); ++tmp) {
+	      if (!dynamic_cast<architecture::type_node*>(*tmp))
+		std::cerr << "the FUCK?!" << std::endl;
+	      else
+		t_function_type
+		  ->registerParameters(dynamic_cast<architecture::type_node*>(*tmp)
+				       ->getTypeInfo());
+	      delete *tmp;
+	    }
+	    m_current_context.erase(currentContext, m_current_context.end());
+	    t_type = t_function_type;
+	  } else if (Char('[')) {
+	    size_t _array_size = 0;
+	    try { _array_size = stoul(cutFollowingWord(detail::int_alphabet)); }
+	    catch (...) { throw (exception::parse_error("invalid size declaration in array",
+					     cursor_position(m_col, m_line))); }
+	    if (!Char(']'))
+	      throw (exception::parse_error("invalid size declaration in array",
+				 cursor_position(m_col, m_line)));
+	    t_type = architecture::type::make_array(t_type, _array_size);
+	  } else if (KeyWord("const")) {
+	    t_type->registerModifier(architecture::type::modifier::_const);
+	  } else {
+	    return (t_type);
+	  }
+	}
+
+	return (t_type);
       }
 
       architecture::type::info*
-      Type_Suffix(architecture::type::info* t_type_info) {
+      Type_Suffix(architecture::type::info* t_type_info, bool t_pointeur = true) {
 	SkipWhiteSpace();
-	return (Type_Suffix_(t_type_info));
+	return (Type_Suffix_(t_type_info, t_pointeur));
       }      
 
       /* Types
@@ -416,17 +516,41 @@ namespace ctvscript{
        */
       architecture::type::info*
       Type_() {
-	const char*			potent_type = cutFollowingWord(detail::type_alphabet).c_str();
+	std::string			potent_type = cutFollowingWord(detail::type_alphabet);
 	architecture::type::modifier	potent_modifier_type = architecture::type::modifier::none;
 	const architecture::type::info* type_info = NULL;
+	cursor_save _save(this);
 
-	while ((type_info = architecture::type::getTypeInfo(potent_type)) == NULL) {
-	  if ((potent_modifier_type = architecture::type::getModifier(potent_type, potent_modifier_type))
-	      == architecture::type::modifier::none)
-	    throw exception::parse_error("Unknown Type", cursor_position(m_line, m_col), potent_type);	    
+	while ((type_info = architecture::type::getTypeInfo(potent_type.c_str())) == NULL) {
+	  if ((potent_modifier_type = architecture::type::getModifier(potent_type.c_str(),
+								      potent_modifier_type))
+	      == architecture::type::modifier::none){
+	    throw exception::parse_error("Unknown Type", cursor_position(m_line, m_col),
+					 std::string(potent_type));
+	  }
 	  potent_type = cutFollowingWord(detail::type_alphabet).c_str();
 	}
 
+	while (Symbol("::")) { /* nested type*/
+	  cursor_save _nested_save(this);
+
+	  std::string nested_type = cutFollowingWord(detail::type_alphabet);
+	  if (architecture::type::is_constructor(type_info, nested_type)) {
+	    if (potent_modifier_type != architecture::type::modifier::none)
+	      throw exception::parse_error("Type Modifier for Constructor {" + nested_type + "}",
+					   cursor_position(m_line, m_col));
+	    _save.restore();
+	    return (architecture::type::make_type(type_info,
+						  architecture::type::modifier::none));
+	  }
+	  if (architecture::type::is_nested_type(type_info, nested_type))
+	    type_info = architecture::type::make_nested_type(type_info, nested_type);
+	  else {
+	    _nested_save.restore();
+	    throw exception::parse_error(nested_type + " is not a nested type of ",
+					 cursor_position(m_line, m_col), type_info->m_name);
+	  }
+	}
 	return (architecture::type::make_type(type_info, potent_modifier_type));
       }
 
@@ -436,15 +560,51 @@ namespace ctvscript{
 	return (Type_());
       }
 
+      bool TypedDeclaration() {
+	architecture::type::info* _type = Type();
+	_type = Type_Suffix(_type);
+	std::string variable_name = cutFollowingWord(detail::id_alphabet);
+	if (variable_name.empty())
+	  throw exception::parse_error("unended variable declaration",
+				       cursor_position(m_line, m_col));
+	_type = Type_Suffix(_type, false);
+	m_current_context.emplace_back(new architecture::variable_node(_type, variable_name));
+	return (true);
+      }
+
       /* Var
        * Variable Declaration
        */
       bool Var() {
 	if (!KeyWord("var"))
 	  return (false);
-	return (true);
+	return (TypedDeclaration());
       }
 
+      /* ParametersList
+       * all's said
+       */
+      bool ParametersList(bool t_defined = true) {
+	if (!Char('('))
+	  return (false);
+	if (!Char(')')) {
+	  do {
+	    if (t_defined)
+	      TypedDeclaration();
+	    else {
+	      architecture::type::info* _type = Type();
+	      _type = Type_Suffix(_type);
+	      _type = Type_Suffix(_type, false);
+	      m_current_context.emplace_back(new architecture::type_node(_type));
+	    }
+	  } while (Char(','));
+	if (!Char(')'))
+	  throw exception::parse_error("Unended Parameter List Declaration",
+				       cursor_position(m_line, m_col));
+	}
+	return (true);
+      }
+      
       /* Def
        * Function Or Method
        */
@@ -453,8 +613,50 @@ namespace ctvscript{
 	  return false;
 	SkipWhiteSpace();
 	if (!has_more_input())
-	  throw exception::parse_error("Unended Function Declaration", cursor_position(m_line, m_col));
-	const architecture::type::info* _type = Type();
+	  throw exception::parse_error("Unended Function Declaration",
+				       cursor_position(m_line, m_col));
+
+	/* fetch Type */
+	architecture::type::info* _type = Type();
+	_type = Type_Suffix(_type);
+	
+	/* fetch Function Id */
+	std::string function_name = cutFollowingWord(detail::id_alphabet);
+	if (function_name.empty())
+	  throw exception::parse_error("Unended Function Declaration",
+				       cursor_position(m_line, m_col));
+
+	
+	/* push Context */
+	std::list<architecture::node*>::iterator currentContext = m_current_context.end();
+
+	/* fetch Parameters*/
+	if (!ParametersList())
+	  throw exception::parse_error("Missing funtion parameters",
+				       cursor_position(m_line, m_col));
+	architecture::function_node* _function = new architecture::
+	  function_node(_type, function_name);
+	if (!Char('{'))
+	  throw exception::parse_error("No function body for function{" +
+				       function_name + "}",
+				       cursor_position(m_line, m_col));
+	for (std::list<architecture::node*>::iterator tmp = currentContext;
+	     tmp != m_current_context.end(); ++tmp)
+	  if (!dynamic_cast<architecture::variable_node*>(*tmp))
+	    std::cerr << "the FUCK?!" << std::endl;
+	  else
+	    _function->registerParameters((dynamic_cast<architecture::variable_node*>(*tmp))
+					  ->getTypeInfo());
+
+	/* register Context */
+	Context();
+	if (!Char('}'))
+	  throw exception::parse_error("Unterminated function body for function{" + function_name + "}",
+				       cursor_position(m_line, m_col));
+ 	_function->setBody(new architecture::context_node(cutContext(currentContext)));
+
+	/* push symbol into superior context */
+	m_current_context.emplace_back(_function);
 	return (true);
       }
 
@@ -462,31 +664,57 @@ namespace ctvscript{
       /*
        * Current Context;
        */
-      void Context_() {
+      void Context() {
 	bool has_more = false;
+	bool need_eol = false;
 	do {
 	  if (BlockEnd_()) {
+	    need_eol = false;
 	    has_more = false;
 	  } else if (Eol()) {
+	    need_eol = false;
 	    has_more = true;
+	  } else if (Var()) {
+	    has_more = true;
+	    need_eol = true;
 	  } else if (Def()) {
+	    has_more = true;
+	    need_eol = false;
 	  } else {
 	    has_more = false;
+	    need_eol = false;
+	  }
+	  if (need_eol && !Eol()) {
+	    throw exception::parse_error("Expected ; before " + cutFollowingWord(detail::any_alphabet)
+					 + " token",
+					 cursor_position(m_line, m_col));
 	  }
 	} while (has_more);
       };
 
       bool parse(const std::string &t_input) {
+
+	m_input_beg = t_input.begin();
 	m_input_pos = t_input.begin();
 	m_input_end = t_input.end();
 
+	m_line_beg = m_input_pos;
+	matchEndLine();
+
 	m_line = 0;
 	m_col = 0;
-	
-	Context_();
-	if (m_input_pos != m_input_end)
-	  throw exception::parse_error("Unparsed Input", cursor_position(m_line, m_col));
-	
+
+	try {
+	  Context();
+	  if (m_input_pos != m_input_end)
+	    throw exception::parse_error("Unparsed Input", cursor_position(m_line, m_col));
+	} catch (exception::parse_error e) {
+	  std::cerr << "Syntax Error"  << std::endl;
+	  std::cerr << e.m_cause << std::endl;
+	  std::cerr << std::endl << std::string(m_line_beg, m_line_end) << std::endl;
+	  std::cerr << std::string(e.m_where.column, ' ') << "^" << std::endl;
+	  return (false);
+	}
 	return (true);
       }
     };
