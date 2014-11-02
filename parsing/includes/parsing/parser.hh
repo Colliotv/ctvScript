@@ -382,9 +382,6 @@ namespace ctvscript{
 	return (false);
       }
 
-
-
-
       bool Symbol_(const char* t_keyword) {
 	size_t len = strlen(t_keyword);
 

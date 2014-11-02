@@ -20,6 +20,10 @@ namespace ctvscript {
     public:
       context_node(const std::list<node*>& t_context)
 	: m_var_context({}), m_context(std::move(t_context)) {}
+
+      void	set_context(const std::list<node*>&& t_context) {
+	m_context = std::move(t_context);
+      }
     };
 
     class type_node	: public node {
