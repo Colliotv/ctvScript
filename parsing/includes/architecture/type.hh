@@ -158,7 +158,8 @@ namespace ctvscript {
     public:
       static type::info*	make_type(const type::info* t_base_type, modifier t_modifier_type) {
 	type::info* _type = t_base_type->clone();
-	_type->registerModifier(t_modifier_type);
+	if (t_modifier_type != modifier::none && !_type->registerModifier(t_modifier_type))
+	  return (NULL);
 	return (_type);
       }
       static modifier		getModifier(const char* t_potent_modifier, modifier t_modifier = modifier::none) {
@@ -179,7 +180,13 @@ namespace ctvscript {
 	      , new void_info()
 	      , new string_info()
 	  }) ,
-	m_modifier_map({})
+	m_modifier_map({
+	    {"" , modifier::none}
+	    , {"signed"   ,	modifier::_signed}
+	    , {"unsigned" ,	modifier::_unsigned}
+	    , {"const"    ,	modifier::_const}
+	    , {"long"     ,	modifier::_long}
+	  })
       {}
 
       static type* get() {

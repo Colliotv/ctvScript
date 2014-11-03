@@ -513,10 +513,10 @@ namespace ctvscript{
        */
       architecture::type::info*
       Type_() {
+	cursor_save			_save(this);
 	std::string			potent_type = cutFollowingWord(detail::type_alphabet);
 	architecture::type::modifier	potent_modifier_type = architecture::type::modifier::none;
 	const architecture::type::info* type_info = NULL;
-	cursor_save _save(this);
 
 	while ((type_info = architecture::type::getTypeInfo(potent_type.c_str())) == NULL) {
 	  if ((potent_modifier_type = architecture::type::getModifier(potent_type.c_str(),
@@ -548,7 +548,13 @@ namespace ctvscript{
 					 cursor_position(m_line, m_col), type_info->m_name);
 	  }
 	}
-	return (architecture::type::make_type(type_info, potent_modifier_type));
+
+	architecture::type::info* final_type = architecture::type::make_type(type_info, potent_modifier_type);
+	if (final_type == nullptr) {
+	  _save.restore();
+	  throw exception::parse_error("Incompatible Type Modifier For Type", cursor_position(m_line, m_col), type_info->m_name);
+	}
+	return (final_type);
       }
 
       architecture::type::info*
@@ -646,11 +652,14 @@ namespace ctvscript{
 					  ->getTypeInfo());
 
 	/* register Context */
+	architecture::context_node* _body = new architecture::context_node(cutContext(currentContext));
 	Context();
 	if (!Char('}'))
 	  throw exception::parse_error("Unterminated function body for function{" + function_name + "}",
 				       cursor_position(m_line, m_col));
- 	_function->setBody(new architecture::context_node(cutContext(currentContext)));
+	
+	_body->append_context(cutContext(currentContext));
+ 	_function->setBody(_body);
 
 	/* push symbol into superior context */
 	m_current_context.emplace_back(_function);
