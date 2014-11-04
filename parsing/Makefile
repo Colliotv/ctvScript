@@ -1,4 +1,5 @@
-NAME	= cTVScript_compiler
+NAME		= cTVScript_compiler
+ctvDirTest	= ctv_test
 
 CC	= g++
 RM	= rm -f
@@ -31,6 +32,9 @@ fclean: clean
 	$(RM) $(NAME)
 
 re: fclean all
+
+test:
+	@find $(ctvDirTest)/*.ctv -exec echo "test on {" {} "}" \; -exec ./$(NAME) {} \;
 
 .cpp.o:
 	$(CC) -c -o $@ $< $(CFLAGS)

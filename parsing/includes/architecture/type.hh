@@ -73,7 +73,10 @@ namespace ctvscript {
 	virtual bool  isConstructor(const std::string& t_t) const override  { return (t_t == "void"); }
       };
       struct string_info : info { string_info() : info("string", true) {}
-	virtual bool  isConstructor(const std::string& t_t) const override  { return (t_t == "string"); }      
+	virtual bool  isConstructor(const std::string& t_t) const override  { return (t_t == "string"); }
+      };
+      struct char_info : info { char_info() : info("char", true) {}
+	virtual bool  isConstructor(const std::string& t_t) const override  { return (t_t == "char"); }
       };
 
       struct pointeur_info : info {
@@ -179,6 +182,7 @@ namespace ctvscript {
 	      , new float_info()
 	      , new void_info()
 	      , new string_info()
+	      , new char_info()
 	  }) ,
 	m_modifier_map({
 	    {"" , modifier::none}

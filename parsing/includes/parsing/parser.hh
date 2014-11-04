@@ -70,6 +70,7 @@ namespace ctvscript{
 					      detail::nline_alphabet)) {
 	    --m_parser->m_line_beg;
 	  }
+	  ++m_parser->m_line_beg;
 	  m_parser->matchEndLine();
 	}
 
@@ -265,9 +266,13 @@ namespace ctvscript{
       }
 
       const std::list<architecture::node*>
-      cutContext(std::list< architecture::node* >::iterator t_split) {
-	std::list<architecture::node*> _tmp(t_split, m_current_context.end());
-	m_current_context.erase(t_split, m_current_context.end());
+      cutContext(size_t t_split) {
+	if (t_split >= m_current_context.size())
+	    return (std::list<architecture::node*>());
+	auto _split = m_current_context.begin();
+	std::advance(_split, t_split);
+	std::list<architecture::node*> _tmp(_split, m_current_context.end());
+	m_current_context.erase(_split, m_current_context.end());
 	return (std::move(_tmp));
       }
 	
@@ -300,6 +305,7 @@ namespace ctvscript{
       bool SkipComment() {
 	size_t col = m_col;
 	size_t line = m_line;
+	cursor_save _save(this);
 
 	if (Symbol_(m_multiline_comment_begin.c_str())) {
 	  bool ended = false;
@@ -307,14 +313,22 @@ namespace ctvscript{
 	    if (Symbol_(m_multiline_comment_end.c_str())) {
 	      ended = true;
 	      break;
-	    } else if (!Eol_()) {
+	    } else if (check_in_alphabet(*m_input_pos, detail::nline_alphabet)) {
+	      m_col = 0;
+	      ++m_line;
+	      ++m_input_pos;
+	      m_line_beg = m_input_pos;
+	      matchEndLine();
+	    } else {
 	      ++m_col;
 	      ++m_input_pos;
 	    }
 	  }
-	  if (!ended)
+	  if (!ended) {
+	    _save.restore();
 	    throw exception::parse_error("Unended Multiline Comment",
 					 cursor_position(line, col));
+	  }
 	  return (true);
 	}
 	else if (Symbol_(m_singleline_comment.c_str())) {
@@ -374,7 +388,6 @@ namespace ctvscript{
 
       bool KeyWord(const char* t_keyword) {
 	SkipWhiteSpace();
-
 	cursor_save _save(this);
 	if (KeyWord_(t_keyword))
 	  return (true);
@@ -458,6 +471,14 @@ namespace ctvscript{
 	return (Eol_());
       }
 
+      /* Value Interpretations
+       *  for int, int.int, intSuffix
+       *  for "string", 'char'
+       */
+      bool
+      RawValue() {
+	return (false);
+      }
       /* Types
        *  Suffixs
        */
@@ -601,8 +622,11 @@ namespace ctvscript{
 	      m_current_context.emplace_back(new architecture::type_node(_type));
 	    }
 	  } while (Char(','));
-	if (!Char(')'))
-	  throw exception::parse_error("Unended Parameter List Declaration",
+	  if (!has_more_input())
+	    throw exception::parse_error("Unended Function Parameters Declaration",
+				       cursor_position(m_line, m_col));
+	  if (!Char(')'))
+	    throw exception::parse_error("Wrong token in Function Parameters Declaration",
 				       cursor_position(m_line, m_col));
 	}
 	return (true);
@@ -624,14 +648,14 @@ namespace ctvscript{
 	_type = Type_Suffix(_type);
 	
 	/* fetch Function Id */
+	SkipWhiteSpace();
 	std::string function_name = cutFollowingWord(detail::id_alphabet);
 	if (function_name.empty())
 	  throw exception::parse_error("Unended Function Declaration",
 				       cursor_position(m_line, m_col));
-
 	
 	/* push Context */
-	std::list<architecture::node*>::iterator currentContext = m_current_context.end();
+	size_t currentContext_pos = m_current_context.size();
 
 	/* fetch Parameters*/
 	if (!ParametersList())
@@ -643,29 +667,32 @@ namespace ctvscript{
 	  throw exception::parse_error("No function body for function{" +
 				       function_name + "}",
 				       cursor_position(m_line, m_col));
-	for (std::list<architecture::node*>::iterator tmp = currentContext;
+	auto tmp = m_current_context.begin();
+	for (std::advance(tmp, currentContext_pos);
 	     tmp != m_current_context.end(); ++tmp)
-	  if (!dynamic_cast<architecture::variable_node*>(*tmp))
-	    std::cerr << "the FUCK?!" << std::endl;
-	  else
+	  if (dynamic_cast<architecture::variable_node*>(*tmp))
 	    _function->registerParameters((dynamic_cast<architecture::variable_node*>(*tmp))
 					  ->getTypeInfo());
 
 	/* register Context */
-	architecture::context_node* _body = new architecture::context_node(cutContext(currentContext));
+	architecture::context_node* _body = new architecture::context_node(cutContext(currentContext_pos));
 	Context();
-	if (!Char('}'))
+	  
+	if (!has_more_input())
 	  throw exception::parse_error("Unterminated function body for function{" + function_name + "}",
 				       cursor_position(m_line, m_col));
+	if (!Char('}'))
+	  throw exception::parse_error("Unknown Token (" +
+				       cutFollowingWord(detail::any_alphabet) + ")",
+				       cursor_position(m_line, m_col));
 	
-	_body->append_context(cutContext(currentContext));
+	_body->append_context(cutContext(currentContext_pos));
  	_function->setBody(_body);
 
 	/* push symbol into superior context */
 	m_current_context.emplace_back(_function);
 	return (true);
       }
-
 
       /*
        * Current Context;
@@ -686,6 +713,9 @@ namespace ctvscript{
 	  } else if (Def()) {
 	    has_more = true;
 	    need_eol = false;
+	    /*	  } else if (Return()) {
+	    has_more = true;
+	    need_eol = false;*/
 	  } else {
 	    has_more = false;
 	    need_eol = false;
@@ -711,14 +741,17 @@ namespace ctvscript{
 	m_col = 0;
 
 	try {
+	  m_current_context.push_back(new architecture::context_node());
 	  Context();
 	  if (m_input_pos != m_input_end)
-	    throw exception::parse_error("Unparsed Input", cursor_position(m_line, m_col));
+	    throw exception::parse_error("Unknown Token (" + cutFollowingWord(detail::any_alphabet) + ")", cursor_position(m_line, m_col));
 	} catch (exception::parse_error e) {
-	  std::cerr << "Syntax Error"  << std::endl;
-	  std::cerr << e.m_cause << std::endl;
-	  std::cerr << std::endl << std::string(m_line_beg, m_line_end) << std::endl;
-	  std::cerr << std::string(e.m_where.column, ' ') << "^" << std::endl;
+	  matchEndLine();
+	  std::cerr << "Syntax Error"	<< std::endl
+		    << e.m_cause	<< std::endl
+		    << std::endl
+		    << std::string(m_line_beg, m_line_end)		<< std::endl
+		    << std::string(e.m_where.column, ' ') << "^"	<< std::endl;
 	  return (false);
 	}
 	return (true);

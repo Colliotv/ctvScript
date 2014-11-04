@@ -6,6 +6,9 @@
 #unginore folder
 !*/
 
+#unignore ctv script
+!*.ctv
+
 #unignore compile
 !*.cpp
 !*.cc
