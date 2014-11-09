@@ -41,8 +41,8 @@ namespace ctvscript{
 	,   type_alphabet
 	,   id_alphabet
 	,   white_alphabet
-	,   int_suffix_alphabet
-	,   float_suffix_alphabet
+	,   suffix_alphabet
+	,   base_suffix_alphabet
 	,   nline_alphabet
 	,   pointeur_alphabet
 	,   max_alphabet
@@ -91,7 +91,7 @@ namespace ctvscript{
       bool m_alphabet [detail::max_alphabet][detail::lengthof_alphabet];
       typedef bool alphabet[];
 
-      std::map<std::string, architecture::instructions::operations_types> m_operators;
+      std::map<std::string, architecture::operations::types> m_operators;
 
     public:
 
@@ -104,94 +104,109 @@ namespace ctvscript{
       void language_default_setup() {
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("?", architecture::instructions::operations_types::ternary));
+			    architecture::operations::types
+			    >("(", architecture::operations::types::parenthesis_open));
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >(")", architecture::operations::types::parenthesis_close));
+
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("?", architecture::operations::types::ternary));
 
 
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("||", architecture::instructions::operations_types::logical_or));
+			    architecture::operations::types
+			    >("new", architecture::operations::types::new_operator));
 
 
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("&&", architecture::instructions::operations_types::logical_and));
+			    architecture::operations::types
+			    >("||", architecture::operations::types::logical_or));
 
 
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("^", architecture::instructions::operations_types::bitwise_xor));
-	m_operators.emplace(std::make_pair<
-			    std::string,
-			    architecture::instructions::operations_types
-			    >("|", architecture::instructions::operations_types::bitwise_or));
-	m_operators.emplace(std::make_pair<
-			    std::string,
-			    architecture::instructions::operations_types
-			    >("&", architecture::instructions::operations_types::bitwise_and));
+			    architecture::operations::types
+			    >("&&", architecture::operations::types::logical_and));
 
 
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("==", architecture::instructions::operations_types::equality));
+			    architecture::operations::types
+			    >("^", architecture::operations::types::bitwise_xor));
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("!=", architecture::instructions::operations_types::equality));
+			    architecture::operations::types
+			    >("|", architecture::operations::types::bitwise_or));
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("&", architecture::operations::types::bitwise_and));
 
 
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >(">=", architecture::instructions::operations_types::comparison));
+			    architecture::operations::types
+			    >("==", architecture::operations::types::equality));
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >(">", architecture::instructions::operations_types::comparison));
-	m_operators.emplace(std::make_pair<
-			    std::string,
-			    architecture::instructions::operations_types
-			    >("<=", architecture::instructions::operations_types::ternary));
-	m_operators.emplace(std::make_pair<
-			    std::string,
-			    architecture::instructions::operations_types
-			    >("<", architecture::instructions::operations_types::ternary));
-
-	m_operators.emplace(std::make_pair<
-			    std::string,
-			    architecture::instructions::operations_types
-			    >("<<", architecture::instructions::operations_types::shift));
-	m_operators.emplace(std::make_pair<
-			    std::string,
-			    architecture::instructions::operations_types
-			    >(">>", architecture::instructions::operations_types::shift));
-
-	m_operators.emplace(std::make_pair<
-			    std::string,
-			    architecture::instructions::operations_types
-			    >("+", architecture::instructions::operations_types::addition));
-	m_operators.emplace(std::make_pair<
-			    std::string,
-			    architecture::instructions::operations_types
-			    >("-", architecture::instructions::operations_types::addition));
+			    architecture::operations::types
+			    >("!=", architecture::operations::types::equality));
 
 
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("*", architecture::instructions::operations_types::multiplication));
+			    architecture::operations::types
+			    >(">=", architecture::operations::types::comparison));
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("/", architecture::instructions::operations_types::multiplication));
+			    architecture::operations::types
+			    >(">", architecture::operations::types::comparison));
 	m_operators.emplace(std::make_pair<
 			    std::string,
-			    architecture::instructions::operations_types
-			    >("%", architecture::instructions::operations_types::multiplication));
+			    architecture::operations::types
+			    >("<=", architecture::operations::types::ternary));
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("<", architecture::operations::types::ternary));
+
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("<<", architecture::operations::types::shift));
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >(">>", architecture::operations::types::shift));
+
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("+", architecture::operations::types::addition));
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("-", architecture::operations::types::addition));
+
+
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("*", architecture::operations::types::multiplication));
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("/", architecture::operations::types::multiplication));
+	m_operators.emplace(std::make_pair<
+			    std::string,
+			    architecture::operations::types
+			    >("%", architecture::operations::types::multiplication));
 
 	for ( int c = 0 ; c < detail::lengthof_alphabet ; ++c ) {
           for (auto & elem : m_alphabet) {
@@ -254,15 +269,14 @@ namespace ctvscript{
         m_alphabet[detail::any_alphabet][static_cast<int>('\t')]=false;
         m_alphabet[detail::any_alphabet][static_cast<int>('\n')]=false;
 
-        m_alphabet[detail::int_suffix_alphabet][static_cast<int>('l')] = true;
-        m_alphabet[detail::int_suffix_alphabet][static_cast<int>('L')] = true;
-        m_alphabet[detail::int_suffix_alphabet][static_cast<int>('u')] = true;
-        m_alphabet[detail::int_suffix_alphabet][static_cast<int>('U')] = true;
+        for ( int c = 'a' ; c <= 'z' ; ++c ) { m_alphabet[detail::suffix_alphabet][c]=true; }
+        for ( int c = 'A' ; c <= 'Z' ; ++c ) { m_alphabet[detail::suffix_alphabet][c]=true; }
+	m_alphabet[detail::suffix_alphabet][static_cast<int>('_')] = true;
 
-        m_alphabet[detail::float_suffix_alphabet][static_cast<int>('l')] = true;
-        m_alphabet[detail::float_suffix_alphabet][static_cast<int>('L')] = true;
-        m_alphabet[detail::float_suffix_alphabet][static_cast<int>('f')] = true;
-        m_alphabet[detail::float_suffix_alphabet][static_cast<int>('F')] = true;
+        m_alphabet[detail::base_suffix_alphabet][static_cast<int>('u')] = true;
+        m_alphabet[detail::base_suffix_alphabet][static_cast<int>('U')] = true;
+        m_alphabet[detail::base_suffix_alphabet][static_cast<int>('f')] = true;
+        m_alphabet[detail::base_suffix_alphabet][static_cast<int>('F')] = true;
       }
 
       const std::list<architecture::node*>
@@ -438,16 +452,22 @@ namespace ctvscript{
 	return (Char_(t_char));
       }
 
-      std::string cutFollowingWord(detail::alphabet t_d) {
-	SkipWhiteSpace();
-	if (!has_more_input())
-	  return (NULL);
+      char	getChar() { char c = *m_input_pos; ++m_input_pos; return (c);}
+
+      const std::string cutFollowingWord_(detail::alphabet t_d) {
+     	if (!has_more_input())
+	  return ("");
 	std::string::const_iterator last = m_input_pos;
 	while (has_more_input() && check_in_alphabet(*m_input_pos, t_d)) {
 	  ++m_input_pos;
 	  ++m_col;
 	}
 	return (std::string(last, m_input_pos));
+      }
+
+      const std::string cutFollowingWord(detail::alphabet t_d) {
+	SkipWhiteSpace();
+	return (cutFollowingWord_(t_d));
       }
 
 
@@ -476,9 +496,118 @@ namespace ctvscript{
        *  for "string", 'char'
        */
       bool
-      RawValue() {
+      RawValue_() {
+	cursor_save _save(this);
+	if (Char('"')) {
+	  std::string::const_iterator sit_beg = m_input_pos;
+	  std::string::const_iterator sit_end = m_input_pos;
+	  while (!Char_('"') && has_more_input()) {
+	    SkipWhiteSpace();
+	    sit_end = m_input_pos;
+	  }
+	  if (!has_more_input()) {
+	    _save.restore();
+	    throw exception::parse_error("unended string decleration",
+					cursor_position(m_col, m_line));
+
+	  }
+	  m_current_context.emplace_back(new architecture::
+					 raw_string_node(std::string(sit_beg, sit_end)));
+	  return (true);
+	}
+	else if (Char('\'')) {
+	  char character = getChar();
+
+	  if (!Char_('\'')) {
+	    _save.restore();
+	    throw exception::parse_error("multi-character character declaration",
+					 cursor_position(m_col, m_line));
+
+	  }
+	  m_current_context.emplace_back(new architecture::
+					 raw_character_node(character));
+	  return (true);
+	}
+
+	if (Symbol("0x") || Symbol("0X")) {
+	  std::string _potent_hex = cutFollowingWord_(detail::hex_alphabet);
+	  if (_potent_hex.empty()) {
+	    _save.restore();
+	    throw exception::parse_error("invalid hexadimal value",
+					 cursor_position(m_col, m_line));
+	  }
+	  m_current_context.emplace_back(new architecture::
+					 raw_hexadecimal_node(_potent_hex));
+	  return (true);
+	}
+
+	if (Symbol("0b") || Symbol("0B")) {
+	  std::string _potent_binary = cutFollowingWord_(detail::bin_alphabet);
+	  if (_potent_binary.empty()) {
+	    _save.restore();
+	    throw exception::parse_error("invalid binary value",
+					 cursor_position(m_col, m_line));
+	  }
+	  m_current_context.emplace_back(new architecture::
+					 raw_binary_node(_potent_binary));
+	  return (true);
+	}
+
+	bool is_integer = true;
+	bool is_signed  = true;
+	std::string _potent_value =  cutFollowingWord(detail::int_alphabet);
+	if (!_potent_value.empty()) {
+	  if (Char_('.')) {
+	    is_integer = false;
+	    _potent_value += "." + cutFollowingWord_(detail::int_alphabet);
+	  }
+	  std::string _suffix_value = cutFollowingWord_(detail::suffix_alphabet);
+	  for (auto _suffix : _suffix_value) {
+	    if (!check_in_alphabet(_suffix, detail::base_suffix_alphabet)) {
+		_save.restore();
+		throw exception::parse_error("in suffix \"" + _suffix_value
+					     + "\" unknow suffix key '" +  _suffix + "'",
+					     cursor_position(m_col, m_line));
+	    }
+	    if (_suffix == 'u' || _suffix == 'U') {
+	      if (is_integer == false) {
+		_save.restore();
+		throw exception::parse_error("invalid suffix \"" + _suffix_value
+					     + "\" floating point can't be unsigned",
+					     cursor_position(m_col, m_line));
+	      } else is_signed = false;
+	    } else if (_suffix == 'f' || _suffix == 'F') {
+	      if (is_signed == false) {
+		_save.restore();
+		throw exception::parse_error("invalid suffix \"" + _suffix_value
+					     + "\" floating point can't be unsigned",
+					     cursor_position(m_col, m_line));
+	      } else is_integer = false;
+	    }
+	  }
+	  if (!is_integer)
+	    m_current_context.emplace_back(new architecture::
+					   raw_floating_node(std::stod(_potent_value)));
+	  else if (!is_signed)
+	    m_current_context.emplace_back(new architecture::
+					   raw_unsigned_integer_node(std::
+								      stoul(_potent_value)));
+	  else
+	    m_current_context.emplace_back(new architecture::
+					   raw_integer_node(std::
+							     stoul(_potent_value)));
+	  return (true);
+	}
+	_save.restore();
 	return (false);
       }
+
+      bool
+      RawValue() {
+	SkipWhiteSpace();
+	return (RawValue_());
+      }
+
       /* Types
        *  Suffixs
        */
@@ -602,7 +731,93 @@ namespace ctvscript{
       bool Var() {
 	if (!KeyWord("var"))
 	  return (false);
-	return (TypedDeclaration());
+	bool _retval = (TypedDeclaration());
+	m_superior_context->addVariable(dynamic_cast<architecture::variable_node*>
+					(*m_current_context.rbegin()));
+	return (_retval);
+      }
+
+      /*
+      * Op
+      * Parse operands list and arrange priority
+      */
+      bool
+      Op_() {
+	bool _ret_value =  false;
+	cursor_save _save(this);
+	bool _need_op = false;
+	
+	/* save context pos for rearange later*/
+	size_t currentContext_pos = m_current_context.size();
+
+	int _parenthesis_level = 0;
+	do {
+	  /* match begin parenthesis */
+	  if (Char('(')) {
+	    _parenthesis_level += 1;
+	    continue;
+	  }
+
+	  /* get value */
+	  if (RawValue()) {
+	    _ret_value = true;
+	    _need_op = true;
+	  } else {
+	    cursor_save _pre_save(this);
+	    architecture::variable_node* variable_node;
+	    std::string _potent_variable = cutFollowingWord(detail::id_alphabet);
+	    if ((variable_node = m_superior_context
+		 ->getVariableByName(_potent_variable)) == nullptr) {
+	      _pre_save.restore();
+	      break;
+	    }
+	    _ret_value = true;
+	    _need_op = true;
+	    m_current_context
+	      .emplace_back(m_superior_context
+			    ->makeVariableAccessByName(_potent_variable));
+	  }
+
+	  /* access op access */
+	  
+	  /* access call Op_, Op_ ... */
+	  
+
+
+	  /*match end parenthesis */
+	  while (_parenthesis_level > 0 && Char(')')) _parenthesis_level -= 1;
+
+	  /* match eol */
+	  cursor_save _cur_save(this);
+	  if (Char(',') || Char(';') || (_parenthesis_level == 0 && Char(')'))) {
+	    _cur_save.restore();
+	    if (_parenthesis_level > 0 && Char(',')) {
+	      _cur_save.restore();
+	      throw exception::parse_error("expected ) before ,",
+					   cursor_position(m_line, m_col));
+	    }
+	    if (_parenthesis_level > 0 && Char(';')) {
+	      _cur_save.restore();
+	      throw exception::parse_error("expected ) before ;",
+					   cursor_position(m_line, m_col));
+	    }
+	    if (!_ret_value)
+	      _save.restore();
+	    return (_ret_value);
+	  }
+
+	} while (has_more_input());
+
+	if (!_ret_value)
+	  _save.restore();
+
+	return (_ret_value);
+      }
+
+      bool
+      Op() {
+	SkipWhiteSpace();
+	return (Op_());
       }
 
       /* ParametersList
@@ -676,14 +891,17 @@ namespace ctvscript{
 
 	/* register Context */
 	architecture::context_node* _body = new architecture::context_node(cutContext(currentContext_pos));
+	_body->add_superior_context(m_superior_context);
+	m_superior_context = _body;
 	Context();
-	  
+	m_superior_context = _body->get_superior_context();
+
 	if (!has_more_input())
 	  throw exception::parse_error("Unterminated function body for function{" + function_name + "}",
 				       cursor_position(m_line, m_col));
 	if (!Char('}'))
-	  throw exception::parse_error("Unknown Token (" +
-				       cutFollowingWord(detail::any_alphabet) + ")",
+	  throw exception::parse_error("Unknown Token \"" +
+				       cutFollowingWord(detail::any_alphabet) + "\"",
 				       cursor_position(m_line, m_col));
 	
 	_body->append_context(cutContext(currentContext_pos));
@@ -691,6 +909,7 @@ namespace ctvscript{
 
 	/* push symbol into superior context */
 	m_current_context.emplace_back(_function);
+	m_superior_context->addVariable(_function);
 	return (true);
       }
 
@@ -713,7 +932,10 @@ namespace ctvscript{
 	  } else if (Def()) {
 	    has_more = true;
 	    need_eol = false;
-	    /*	  } else if (Return()) {
+	  } else if (Op()) {
+	    has_more = true;
+	    need_eol = true;
+       /* } else if (Return()) {
 	    has_more = true;
 	    need_eol = false;*/
 	  } else {
@@ -741,10 +963,12 @@ namespace ctvscript{
 	m_col = 0;
 
 	try {
-	  m_current_context.push_back(new architecture::context_node());
+	  m_current_context.push_back(m_superior_context = new
+				      architecture::context_node());
+	  
 	  Context();
 	  if (m_input_pos != m_input_end)
-	    throw exception::parse_error("Unknown Token (" + cutFollowingWord(detail::any_alphabet) + ")", cursor_position(m_line, m_col));
+	    throw exception::parse_error("Unknown Token \"" + cutFollowingWord(detail::any_alphabet) + "\"", cursor_position(m_line, m_col));
 	} catch (exception::parse_error e) {
 	  matchEndLine();
 	  std::cerr << "Syntax Error"	<< std::endl
