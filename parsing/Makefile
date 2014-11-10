@@ -1,5 +1,5 @@
 NAME		= cTVScript_compiler
-ctvDirTest	= ctv_test
+ctvDirTest	= test_ctv
 
 CC	= g++
 RM	= rm -f
