@@ -70,8 +70,13 @@ namespace ctvscript {
 		  std::back_inserter(m_context));
       }
 
-      void	addVariable(variable_node* t_v) {
+      bool	addVariable(variable_node* t_v) {
+	for (auto _variable : m_var_context) {
+	  if (_variable->getName() == t_v->getName())
+	    return (false);
+	}
 	m_var_context.push_back(t_v);
+	return (true);
       }
 
       variable_node* getVariableByName(const std::string& t_name) {
