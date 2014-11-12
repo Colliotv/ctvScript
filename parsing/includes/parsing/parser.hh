@@ -60,6 +60,11 @@ namespace ctvscript{
 	cursor_save(language_parser* t_parser)
 	  : m_parser(t_parser), m_it(t_parser->m_input_pos),
 	    m_line(t_parser->m_line), m_col(t_parser->m_col) {}
+	void actualize() {
+	  m_it = m_parser->m_input_pos;
+	  m_line = m_parser->m_line;
+	  m_col = m_parser->m_col;
+	}
 	void restore() {
 	  m_parser->m_input_pos = m_it;
 	  m_parser->m_line = m_line;
@@ -148,7 +153,7 @@ namespace ctvscript{
 	  m_alphabet[detail::any_alphabet][c] = true;
         }
 
-	m_operator_max_word_length = sizeof("delete");
+	m_operator_max_word_length = sizeof("->*");
         m_alphabet[detail::symbol_alphabet][static_cast<int>('?')]=true;
         m_alphabet[detail::symbol_alphabet][static_cast<int>('+')]=true;
         m_alphabet[detail::symbol_alphabet][static_cast<int>('-')]=true;
@@ -728,7 +733,7 @@ namespace ctvscript{
 	cursor_save _save(this);
 	
 	/* save context pos for rearange later*/
-	class enum need_state {none, var, op} _needs = none;
+	enum class need_state {none, var, op, type} _needs = need_state::none;
 	size_t currentContext_pos = m_current_context.size();
 	int _parenthesis_level = 0;
 	architecture::operations::tree _tree;
@@ -737,43 +742,50 @@ namespace ctvscript{
 	  /* match begin parenthesis */
 	  if (Char('(')) {
 	    _tree.pushDown();
-	    _parenthesis_level += 1;
 	    continue;
 	  }
 
-	  /* get value */
-	  if (!VarAccess()) {
-	    _retval = _retval ? true : false;
-	  } else { _tree.pushValue(); }
-
-	  /* access op access */
-	  std::string _ops = cutFollowingWord(detail::symbol_alphabet);
-	  while (!_ops.empty()) {
-	    while (!_ops.empty()) {
-	      for (size_t _it = m_operator_max_word_length;
-		   _it > 0; it--) {
-		if (m_operators.find(_ops.substring(0, _it)) != m_operators.end()) {
-		  auto _op = m_operators.at(_ops.substring(0, _it));
-		  _ops.substring(0, _it);
-		} else if (_it == 1) break;
+	  switch (_needs) {
+	  default:
+	    /* access op access */
+	    {
+	      std::string _ops = cutFollowingWord(detail::symbol_alphabet);
+	      while (!_ops.empty()) {
+		while (!_ops.empty()) {
+		  for (size_t _it = m_operator_max_word_length;
+		       _it > 0; _it--) {
+		    if (m_operators.find(_ops.substr(0, _it)) != m_operators.end()) {
+		      _needs = need_state::var;
+		      auto _op = m_operators.at(_ops.substr(0, _it));
+		      _ops = _ops.substr(_it);
+		    } else if (_it == 1) break;
+		  }
+		}
+		_ops = cutFollowingWord(detail::symbol_alphabet);
 	      }
 	    }
-	    if (_ops.empty())
-	      _ops = cutFollowingWord(detail::symbol_alphabet);
-	    else
-	      std::advance(m_input_pos, -_ops.size());
+
+	    break;
+	  case need_state::var :
+	    /* get value */
+	    if (!VarAccess()) {
+	      _retval = _retval ? true : false; // should throw an error!
+	    } else { _tree.pushValue(); _needs = need_state::op; }
+
+	    break;
+	  case need_state::type :
+	    break;
 	  }
-	  
 
 	  /* access call Op_, Op_ ... */
 
 	  /*match end parenthesis */
-	  while (_parenthesis_level > 0 && Char(')'))
-	    { _parenthesis_level -= 1; _tree.pushUp(); }
+	  while (_tree.level() > 0 && Char(')'))
+	    { _tree.pushUp(); }
 
 	  /* match eol */
 	  cursor_save _cur_save(this);
-	  if (Char(',') || Char(';') || (_parenthesis_level == 0 && Char(')'))) {
+	  if (Char(',') || Char(';') || (_tree.level() == 0 && Char(')'))) {
 	    _cur_save.restore();
 	    if (_parenthesis_level > 0 && Char(',')) {
 	      _cur_save.restore();

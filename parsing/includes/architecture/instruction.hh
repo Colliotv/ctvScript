@@ -45,11 +45,15 @@ namespace ctvscript {
 	struct var_node : node {};
 	struct down_node : node {};
 	
+      private:
+	int	level;
+
       public:
 	void	pushOperation(operations::types) {}
 	void	pushValue() {}
 	void	pushDown() {}
 	void	pushUp() {}
+	int	level() { return (0); }
       };
 
     public:
