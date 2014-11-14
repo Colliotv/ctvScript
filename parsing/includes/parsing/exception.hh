@@ -72,6 +72,13 @@ namespace ctvscript {
       return (ss.str());
     }
 
+    static std::string
+    format(const architecture::operations::invalid_operand& t_what,
+	   const cursor_position &t_where) {
+      std::stringstream ss;
+      ss << format_why("operand + can't be predecessed by +") << " " << format_location(t_where) << std::endl;
+    }
+
   };
   namespace exception {
     struct parse_error : public std::runtime_error {
@@ -91,6 +98,8 @@ namespace ctvscript {
 	: std::runtime_error(parser::format(t_cause, t_where, t_type)), m_cause(parser::format(t_cause, t_where, t_type)), m_where(t_where)
       {}
 
+      parse_error(const architecture::operations::invalid_operand& e, const parser::cursor_position& t_where)
+	: std::runtime_error(parser::format(e, t_where)), m_cause(parser::format(e, t_where)), m_where(t_where) {}
     };
   };
 };

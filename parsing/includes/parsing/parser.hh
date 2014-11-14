@@ -735,7 +735,7 @@ namespace ctvscript{
 	/* save context pos for rearange later*/
 	enum class need_state {none, var, op, type} _needs = need_state::none;
 	size_t currentContext_pos = m_current_context.size();
-	int _parenthesis_level = 0;
+	const int p = 0;
 	architecture::operations::tree _tree;
 
 	do {
@@ -747,7 +747,7 @@ namespace ctvscript{
 
 	  switch (_needs) {
 	  default:
-	    /* access op access */
+	    /* access op access */ // 5 + ++a
 	    {
 	      std::string _ops = cutFollowingWord(detail::symbol_alphabet);
 	      while (!_ops.empty()) {
@@ -755,25 +755,34 @@ namespace ctvscript{
 		  for (size_t _it = m_operator_max_word_length;
 		       _it > 0; _it--) {
 		    if (m_operators.find(_ops.substr(0, _it)) != m_operators.end()) {
-		      _needs = need_state::var;
 		      auto _op = m_operators.at(_ops.substr(0, _it));
 		      _ops = _ops.substr(_it);
-		    } else if (_it == 1) break;
+		      try {
+			_tree.pushOperation(_op);
+		      } catch( architecture::operations::invalid_operand e ) {
+			throw exception::parse_error(e, cursor_position(m_col, m_line));
+		      }
+		      break;
+		    } else if (_it == 1) goto op_deduction_end;
 		  }
 		}
 		_ops = cutFollowingWord(detail::symbol_alphabet);
 	      }
 	    }
+	  op_deduction_end:
 
 	    break;
 	  case need_state::var :
 	    /* get value */
 	    if (!VarAccess()) {
 	      _retval = _retval ? true : false; // should throw an error!
-	    } else { _tree.pushValue(); _needs = need_state::op; }
+	    } else { _tree.pushValue(); }
 
+	    _needs = need_state::op;
 	    break;
 	  case need_state::type :
+	    
+	    _needs = need_state::op;
 	    break;
 	  }
 
@@ -787,12 +796,12 @@ namespace ctvscript{
 	  cursor_save _cur_save(this);
 	  if (Char(',') || Char(';') || (_tree.level() == 0 && Char(')'))) {
 	    _cur_save.restore();
-	    if (_parenthesis_level > 0 && Char(',')) {
+	    if (_tree.level() > 0 && Char(',')) {
 	      _cur_save.restore();
 	      throw exception::parse_error("expected ) before ,",
 					   cursor_position(m_line, m_col));
 	    }
-	    if (_parenthesis_level > 0 && Char(';')) {
+	    if (_tree.level() > 0 && Char(';')) {
 	      _cur_save.restore();
 	      throw exception::parse_error("expected ) before ;",
 					   cursor_position(m_line, m_col));

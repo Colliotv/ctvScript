@@ -29,6 +29,23 @@ namespace ctvscript {
       };
 
     public:
+      struct lvalue_required : std::runtime_error {
+	operations::types	m_type;
+	lvalue_required(operations::types t_type) : std::runtime_error("need lvalue"), m_type(t_type) {}
+      };
+
+      struct const_assignement : std::runtime_error {
+
+      };
+
+      struct invalid_operand : std::runtime_error {
+	operations::types	m_left_type;
+	operations::types	m_added_type;
+	invalid_operand(operations::types t_left, operations::types t_added)
+	  : std::runtime_error("invalid operation construction"), m_left_type(t_left), m_added_type(t_added) {}
+      };
+
+    public:
       class tree {
       private:
 	struct node {
@@ -46,7 +63,7 @@ namespace ctvscript {
 	struct down_node : node {};
 	
       private:
-	int	level;
+	int	m_level;
 
       public:
 	void	pushOperation(operations::types) {}
