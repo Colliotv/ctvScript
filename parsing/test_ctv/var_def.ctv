@@ -1,4 +1,4 @@
 var int oui;
 var void non;
-oui;
+oui + non + non + oui + new non;
 non;

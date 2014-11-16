@@ -9,7 +9,6 @@ def int  test(int a, byte b) {
 }
 
 def void main() {
-	((((5))));
 }
 
 //file end

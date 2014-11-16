@@ -9,7 +9,7 @@ namespace ctvscript {
       int line;
       int column;
 
-      cursor_position(int t_file_line, int t_file_column)
+      cursor_position(int t_file_column, int t_file_line)
 	: line(t_file_line), column(t_file_column) { }
 
       cursor_position() : line(0), column(0) { }
@@ -73,10 +73,11 @@ namespace ctvscript {
     }
 
     static std::string
-    format(const architecture::operations::invalid_operand& t_what,
+    format(const architecture::operations::invalid_operand&,
 	   const cursor_position &t_where) {
       std::stringstream ss;
       ss << format_why("operand + can't be predecessed by +") << " " << format_location(t_where) << std::endl;
+      return (ss.str());
     }
 
   };

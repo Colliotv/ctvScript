@@ -10,10 +10,10 @@
 # include <list>
 # include <map>
 
-
-# include "architecture/node.hh"
-# include "architecture/instruction.hh"
 # include "architecture/type.hh"
+# include "parsing/public_parser.hh"
+# include "architecture/instruction.hh"
+# include "architecture/node.hh"
 
 # include "parsing/exception.hh"
 
@@ -50,7 +50,7 @@ namespace ctvscript{
       };
     };
 
-    class language_parser{
+    class language_parser : public_parser{
     private:
 
       struct cursor_save {
@@ -96,8 +96,12 @@ namespace ctvscript{
       bool m_alphabet [detail::max_alphabet][detail::lengthof_alphabet];
       typedef bool alphabet[];
 
-      size_t						     m_operator_max_word_length;
-      std::map<std::string, architecture::operations::types> m_operators;
+      
+      std::vector<std::string>					m_reserved_keywords;
+      std::vector<std::pair<std::string,
+			    architecture::operations::types> >	m_keywords_operator;
+      std::map<std::string, architecture::operations::types>	m_operators;
+      size_t							m_operator_max_word_length;
 
     public:
 
@@ -106,13 +110,21 @@ namespace ctvscript{
 	  m_multiline_comment_begin("/*"),
           m_multiline_comment_end("*/"),
           m_singleline_comment("//"),
-	  m_operators({
-	      { "(",		architecture::operations::types::parenthesis_operator},
-
-	      { "?",		architecture::operations::types::ternary},
-
+	  m_reserved_keywords({
+	      "new", "delete", "lock", "def", "var", "throw", "operator"
+		}),
+	  m_keywords_operator({
 	      { "new",		architecture::operations::types::new_operator},
 	      { "delete",	architecture::operations::types::delete_operator},
+	    }),
+	  m_operators({
+	      { "new",		architecture::operations::types::new_operator},
+	      { "delete",	architecture::operations::types::delete_operator},
+
+	      { "(",		architecture::operations::types::parenthesis_operator},
+	      { "()",		architecture::operations::types::parenthesis_operator_end},
+
+	      { "?",		architecture::operations::types::ternary},
 
 	      { "||",		architecture::operations::types::logical_or},
 	      { "&&",		architecture::operations::types::logical_and},
@@ -154,6 +166,9 @@ namespace ctvscript{
         }
 
 	m_operator_max_word_length = sizeof("->*");
+        m_alphabet[detail::symbol_alphabet][static_cast<int>(':')]=true;
+        m_alphabet[detail::symbol_alphabet][static_cast<int>('(')]=true;
+        m_alphabet[detail::symbol_alphabet][static_cast<int>(')')]=true;
         m_alphabet[detail::symbol_alphabet][static_cast<int>('?')]=true;
         m_alphabet[detail::symbol_alphabet][static_cast<int>('+')]=true;
         m_alphabet[detail::symbol_alphabet][static_cast<int>('-')]=true;
@@ -727,6 +742,42 @@ namespace ctvscript{
       * Op
       * Parse operands list and arrange priority
       */
+      void Operand(architecture::operations::tree& t_tree) {
+	std::string _ops = cutFollowingWord(detail::symbol_alphabet);
+	while (!_ops.empty()) {
+
+	  size_t _it = 0;
+	  for (auto& keyword_pair : m_keywords_operator) {
+	    if (KeyWord(keyword_pair.first.c_str())) {
+	      if (!t_tree.pushOperation(keyword_pair.second)) return ;
+	      break;
+	    }
+	  }
+
+	  while (!_ops.empty()) {
+	    for (size_t _it = (m_operator_max_word_length > _ops.size()) ?
+		   _ops.size() : m_operator_max_word_length;
+		 _it > 0; _it--) {
+
+	      if (m_operators.find(_ops.substr(0, _it)) != m_operators.end()) {
+		auto _op = m_operators.at(_ops.substr(0, _it));
+		try { if (!t_tree.pushOperation(_op)) return ; }
+		catch( architecture::operations::invalid_operand e ) {
+		  m_col -= _it;  throw exception
+				   ::parse_error("operator " + _ops.substr(0, _it) +
+						 " have to be predecessed by a value"
+						 , cursor_position(m_col, m_line));
+		}
+		_ops = _ops.substr(_it);
+		break;
+	      } else if (_it == 1) return ;
+
+	    }
+	  }
+	  _ops = cutFollowingWord(detail::symbol_alphabet);
+	}
+      }
+
       bool
       Op_() {
 	bool _retval = false;
@@ -735,48 +786,22 @@ namespace ctvscript{
 	/* save context pos for rearange later*/
 	enum class need_state {none, var, op, type} _needs = need_state::none;
 	size_t currentContext_pos = m_current_context.size();
-	const int p = 0;
-	architecture::operations::tree _tree;
+	architecture::operations::tree _tree(this);
 
 	do {
-	  /* match begin parenthesis */
-	  if (Char('(')) {
-	    _tree.pushDown();
-	    continue;
-	  }
-
 	  switch (_needs) {
 	  default:
-	    /* access op access */ // 5 + ++a
-	    {
-	      std::string _ops = cutFollowingWord(detail::symbol_alphabet);
-	      while (!_ops.empty()) {
-		while (!_ops.empty()) {
-		  for (size_t _it = m_operator_max_word_length;
-		       _it > 0; _it--) {
-		    if (m_operators.find(_ops.substr(0, _it)) != m_operators.end()) {
-		      auto _op = m_operators.at(_ops.substr(0, _it));
-		      _ops = _ops.substr(_it);
-		      try {
-			_tree.pushOperation(_op);
-		      } catch( architecture::operations::invalid_operand e ) {
-			throw exception::parse_error(e, cursor_position(m_col, m_line));
-		      }
-		      break;
-		    } else if (_it == 1) goto op_deduction_end;
-		  }
-		}
-		_ops = cutFollowingWord(detail::symbol_alphabet);
-	      }
-	    }
-	  op_deduction_end:
-
+	    { Operand(_tree); } _needs = need_state::var;
 	    break;
 	  case need_state::var :
 	    /* get value */
 	    if (!VarAccess()) {
-	      _retval = _retval ? true : false; // should throw an error!
-	    } else { _tree.pushValue(); }
+	      std::string _value = cutFollowingWord(detail::id_alphabet);
+	      throw exception::parse_error((!_value.empty())
+					  ? "'" + _value + "' was not declared in this scope"
+					  : "need value after operand"
+					  ,cursor_position(m_col, m_line));
+	    } else { _tree.pushValue(); _retval = true; }
 
 	    _needs = need_state::op;
 	    break;
@@ -785,12 +810,6 @@ namespace ctvscript{
 	    _needs = need_state::op;
 	    break;
 	  }
-
-	  /* access call Op_, Op_ ... */
-
-	  /*match end parenthesis */
-	  while (_tree.level() > 0 && Char(')'))
-	    { _tree.pushUp(); }
 
 	  /* match eol */
 	  cursor_save _cur_save(this);
@@ -817,6 +836,11 @@ namespace ctvscript{
 	  _save.restore();
 
 	return (_retval);
+      }
+
+      bool
+      stackOperand() override {
+	return (Op_());
       }
 
       bool
@@ -869,7 +893,9 @@ namespace ctvscript{
 	
 	/* fetch Function Id */
 	SkipWhiteSpace();
-	std::string function_name = cutFollowingWord(detail::id_alphabet);
+
+	std::string function_name = cutFollowingWord(detail::id_alphabet); //TODO: extend id verification
+
 	if (function_name.empty())
 	  throw exception::parse_error("Unended Function Declaration",
 				       cursor_position(m_line, m_col));
@@ -905,8 +931,8 @@ namespace ctvscript{
 	  throw exception::parse_error("Unterminated function body for function{" + function_name + "}",
 				       cursor_position(m_line, m_col));
 	if (!Char('}'))
-	  throw exception::parse_error("Unknown Token \"" +
-				       cutFollowingWord(detail::any_alphabet) + "\"",
+	  throw exception::parse_error("Unknown Token '" +
+				       cutFollowingWord(detail::any_alphabet) + "' ",
 				       cursor_position(m_line, m_col));
 	
 	_body->append_context(cutContext(currentContext_pos));
@@ -973,7 +999,7 @@ namespace ctvscript{
 	  
 	  Context();
 	  if (m_input_pos != m_input_end)
-	    throw exception::parse_error("Unknown Token \"" + cutFollowingWord(detail::any_alphabet) + "\"", cursor_position(m_line, m_col));
+	    throw exception::parse_error("Unknown Token '" + cutFollowingWord(detail::any_alphabet) + "' ", cursor_position(m_line, m_col));
 	} catch (exception::parse_error e) {
 	  matchEndLine();
 	  std::cerr << "Syntax Error"	<< std::endl
