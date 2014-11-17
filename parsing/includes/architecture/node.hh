@@ -9,6 +9,15 @@ namespace ctvscript {
   namespace architecture{
 
     class node {
+    private:
+      parser::cursor_position m_where_defined;
+
+    public:
+      node* where_definition(const parser::cursor_position& t_pos) {
+	m_where_defined = t_pos;
+	return (this);
+      }
+
     public:
       virtual char getByteInfo() const { return (0x0); }
       virtual const type::info* eax_type() const { return (NULL); }

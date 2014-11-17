@@ -10,6 +10,25 @@
 # include <list>
 # include <map>
 
+
+namespace ctvscript {
+  namespace parser{
+    struct cursor_position {
+      int line;
+      int column;
+
+      cursor_position(int t_file_column, int t_file_line)
+	: line(t_file_line), column(t_file_column) { }
+      void operator =(const cursor_position& t_cursor) {
+	line = t_cursor.line;
+	column = t_cursor.column;
+      }
+
+      cursor_position() : line(0), column(0) { }
+    };
+  };
+};
+
 # include "architecture/type.hh"
 # include "parsing/public_parser.hh"
 # include "architecture/instruction.hh"

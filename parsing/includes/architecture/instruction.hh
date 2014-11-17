@@ -72,9 +72,9 @@ namespace ctvscript {
 	node*	m_first;
 	node*	m_last;
 
-	public_parser* m_parser;
+	parser::public_parser* m_parser;
       public:
-	tree(public_parser* t_parser) : m_level(0), m_first(nullptr), m_last(nullptr), m_parser(t_parser) {}
+	tree(parser::public_parser* t_parser) : m_level(0), m_first(nullptr), m_last(nullptr), m_parser(t_parser) {}
 
       private:
 	void	addNode(node* t_node) {
