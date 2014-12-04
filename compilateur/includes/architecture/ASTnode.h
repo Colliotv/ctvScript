@@ -24,24 +24,24 @@ namespace ctvscript {
      * A key word is language specs
      */
     namespace keyword {
-      class Var		: AST::node{};
-      class Fun		: AST::node{};
-      class If		: AST::node{}; 
-      class Return	: AST::node{};
+      class Var;	//: AST::node{};
+      class Fun;	//: AST::node{};
+      class If;		//: AST::node{}; 
+      class Return;	//: AST::node{};
     };
 
     /*
      * Symbols
      */
     namespace symbol {
-      class Semicolon	: AST::node{};
-      class WhiteSpace	: AST::node{};
-      class Bparenthesis: AST::node{};
-      class Eparenthesis: AST::node{};
-      class Bbracket	: AST::node{};
-      class Ebracket	: AST::node{};
-      class Bsqbrackets	: AST::node{};
-      class Esqbrackets	: AST::node{};
+      class Semicolon;	 //: AST::node{};
+      class WhiteSpace;	 //: AST::node{};
+      class Bparenthesis;//: AST::node{};
+      class Eparenthesis;//: AST::node{};
+      class Bbracket;	 //: AST::node{};
+      class Ebracket;	 //: AST::node{};
+      class Bsqbrackets; //: AST::node{};
+      class Esqbrackets; //: AST::node{};
     };
   };
 };
