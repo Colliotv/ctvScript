@@ -6,9 +6,9 @@ namespace ctvscript {
   namespace parser {
 
     const std::map<syntax::identifier, syntax::dictionnary_member> syntax::dictionnary({
-	{syntax::identifier::whitespace,	{std::regex("( |\t)*")		, 1}},
-	  {syntax::identifier::new_line,	{std::regex("(\r\n|\n)*")	, 1}},
-	    {syntax::identifier::variable,	{SOLID_REGEX("var")}}
+	{syntax::identifier::whitespace,	{VARIABLE_REGEX("( |\t)+")}},
+	  {syntax::identifier::new_line,	{VARIABLE_REGEX("(\r\n|\n)+")}},
+	    {syntax::identifier::variable,	{SOLID_REGEX("var")}},
       });
 
     bool
@@ -17,12 +17,15 @@ namespace ctvscript {
 	return (false);
 
       cursor _advance = t_cursor;
-      std::advance(_advance, t_member.m_min_match_size - 1);
+      std::advance(_advance, t_member.m_min_match_size);
+      std::cerr << "advance:" << t_member.m_min_match_size - 1 << std::endl;
       for (;
 	   _advance != t_end && std::regex_match(std::string(t_cursor, _advance), t_member.m_match);
-	   ++_advance);
-      if ((size_t)std::distance(t_cursor, _advance) != t_member.m_min_match_size - 1
+	   ++_advance) std::cerr << std::string(t_cursor, _advance) << " = " << std::regex_match(std::string(t_cursor, _advance), t_member.m_match) << std::endl;
+      std::cerr << std::string(t_cursor, _advance) << " = " << std::regex_match(std::string(t_cursor, _advance), t_member.m_match) << std::endl;
+      if ((size_t)std::distance(t_cursor, _advance) != t_member.m_min_match_size
 	  && std::distance(t_cursor, _advance) > 0) {
+	std::cerr << "true" << std::endl;
 	t_cursor = _advance;
 	return (true);
       }

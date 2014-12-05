@@ -16,6 +16,7 @@ namespace ctvscript {
 
 	_cursor.m_line += _save.distance(_cursor);
 
+	std::cout << std::string( (std::string::const_iterator&)_save, (std::string::const_iterator&)_cursor);
 	switch (_identifier.first) {
 	case syntax::identifier::whitespace:
 	  break; //ignore
@@ -24,7 +25,7 @@ namespace ctvscript {
 	  break;
 	case syntax::identifier::unknown:
 	  /* throw an error*/
-	  std::cerr << "unknown" << std::endl;
+	  std::cout << "unknown" << std::endl;
 	  break;
 	default:
 	  /* create node */
@@ -33,8 +34,10 @@ namespace ctvscript {
 	_save = _cursor;
 
 	while (syntax::next_word_is<syntax::identifier::whitespace>(_cursor.m_cursor, _end));
+	std::cout << std::string( (std::string::const_iterator&)_save, (std::string::const_iterator&)_cursor);
 	_cursor.m_line += _save.distance(_cursor);
       }
+      std::cout << std::endl;
       return (_list);
     }
 

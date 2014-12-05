@@ -4,7 +4,8 @@
 # include <regex>
 # include <map>
 
-# define SOLID_REGEX(__string__) std::regex(__string__), sizeof(__string__) - 1
+# define VARIABLE_REGEX(__string__)	std::regex(__string__), 1
+# define  SOLID_REGEX(__string__)	std::regex(__string__), sizeof(__string__) - 1
 
 namespace ctvscript {
   namespace parser{
@@ -15,8 +16,19 @@ namespace ctvscript {
 	unknown
 	  , whitespace
 	  , new_line
+
 	  , variable
 	  , function
+	  , if_statement
+	  , else_statement
+	  , return_statement
+
+	  , semicolon
+	  , Bparenthesis, Eparenthesis
+	  , Bbrackets, Ebrackets
+	  , Bsqbrackets, Esqbrackets
+
+	  , operators_simbol
 	  };
       struct dictionnary_member { std::regex m_match; size_t m_min_match_size; };
       static const std::map<syntax::identifier, syntax::dictionnary_member> dictionnary;

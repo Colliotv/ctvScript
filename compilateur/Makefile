@@ -9,12 +9,14 @@ INC	= -I ./includes
 ########################
 #### MAIN
 MAIN	= src/first.cpp
+#### ARCHI
+ARCHI	= src/architecture/ASTfactory.cpp
 ### syntax
 SYNTAX	= src/syntax/ASTparser.cpp\
 	src/syntax/utils.cpp\
 	src/syntax/dictionnary.cpp
 ########################
-SRC	=  $(MAIN) $(SYNTAX)
+SRC	=  $(MAIN) $(SYNTAX) $(ARCHI)
 
 FLAGS	= -W -Wall -Wextra $(INC) -std=c++11 -g3
 
