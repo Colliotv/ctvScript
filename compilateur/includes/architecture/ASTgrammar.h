@@ -1,11 +1,14 @@
 #ifndef ASTgrammar_h__
 # define ASTgrammar_h__
 
-#include "architecture/ASTnode.h"
+# include <list>
+
+# include "architecture/ASTnode.h"
 
 namespace ctvscript {
   namespace AST {
     namespace tree{
+
       enum class line_name{
 	global, blob
       };
@@ -14,6 +17,7 @@ namespace ctvscript {
       struct GrammarLine{
 	static const AST::tree::line_name name = line;
 	using node_line = superior_node;
+	static std::list<AST::node*> onResult(std::list<AST::node*>);
       };
 
 
@@ -44,12 +48,13 @@ namespace ctvscript {
        * Grammar Definition
        */
       template<typename... lines>
-      struct Grammar{
+      struct GrammarTree{
 	template <AST::tree::line_name name>
 	struct fetch{
 	  using grammarLine = typename seek_line<name, lines...>::line;
 	};
       };
+
 
       template<typename... nodes>
       struct Repeat{};
@@ -62,23 +67,25 @@ namespace ctvscript {
       struct Compare{};
       template<AST::tree::line_name line>
       struct Call{};
+
+      typedef GrammarTree<GrammarLine<line_name::global, And<Call<line_name::global>, Call<line_name::blob> > > > Grammar; 
     };
 
 
     template<typename node>
-    struct organize;
+    struct for_;
 
+    template<typename node>
+    struct for_< tree::Repeat<node> >;
     template<typename... nodes>
-    struct organize< tree::Repeat<nodes...> >;
+    struct for_< tree::Or<nodes...> >;
     template<typename... nodes>
-    struct organize< tree::Or<nodes...> >;
-    template<typename... nodes>
-    struct organize< tree::And<nodes...> >;
+    struct for_< tree::And<nodes...> >;
 
     template<typename ASTnode>
-    struct organize< tree::Compare<ASTnode> >;
+    struct for_< tree::Compare<ASTnode> >;
     template<AST::tree::line_name line>
-    struct organize< tree::Call<line> >;
+    struct for_< tree::Call<line> >;
   };
 };
 

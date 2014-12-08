@@ -10,7 +10,8 @@ INC	= -I ./includes
 #### MAIN
 MAIN	= src/first.cpp
 #### ARCHI
-ARCHI	= src/architecture/ASTfactory.cpp
+ARCHI	= src/architecture/ASTfactory.cpp \
+	src/architecture/ASTgrammar.cpp
 ### syntax
 SYNTAX	= src/syntax/ASTparser.cpp\
 	src/syntax/utils.cpp\
