@@ -20,13 +20,16 @@ namespace ctvscript {
       struct variadic_template_inverter<head, tail...> {
 	using list = typename variadic_append< head, typename variadic_template_inverter<tail...>::list >::list;
       };
+
     };
+
     template<bool... retvals>
     static void void_() {}
 
     template<typename tree_node>
     struct for_< tree::Repeat<tree_node> > {
-      static bool organize(std::list<node*> t_ASTnodes, std::list<AST::node*>::iterator& t_cursor) {
+      static bool organize(std::list<node*> t_ASTnodes, std::list<AST::node*>::iterator& t_cursor,
+			   std::list<AST::node*>::iterator& t_further) {
 	bool retval = false;
 	std::list<node*>::iterator save = t_cursor;
 
@@ -37,6 +40,7 @@ namespace ctvscript {
 	  t_cursor = save;
 	return (retval);
       }
+
     };
 
     template<typename... nodes>
@@ -46,7 +50,8 @@ namespace ctvscript {
       struct sub_;
       template<typename... _nodes> //prevent template reversion
       struct sub_< std::tuple<_nodes...> > {
-	static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor) {
+	static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor,
+			     std::list<AST::node*>::iterator& t_further) {
 	  bool retval = false;
 	  std::list<node*>::iterator save = t_cursor;
 	  void_(
@@ -61,7 +66,8 @@ namespace ctvscript {
       };
 
     public:
-      static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor) {
+      static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor,
+			   std::list<AST::node*>::iterator& t_further) {
 	return sub_<utils::variadic_template_inverter<nodes...> >::organize(t_ASTnodes, t_cursor);
       }
     };
@@ -73,7 +79,8 @@ namespace ctvscript {
       struct sub_;
       template<typename... _nodes>
       struct sub_< std::tuple<_nodes...> > {
-	static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor) {
+	static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor,
+			     std::list<AST::node*>::iterator& t_further) {
 	  bool inv_retval = true;
 	  std::list<node*>::iterator save = t_cursor;
 	  void_(
@@ -88,14 +95,16 @@ namespace ctvscript {
       };
 
     public:
-      static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor) {
+      static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor,
+			   std::list<AST::node*>::iterator& t_further) {
 	return sub_<utils::variadic_template_inverter<nodes...> >::organize(t_ASTnodes, t_cursor);
       }
     };
 
     template<AST::tree::line_name line>
     struct for_< tree::Call<line> > {
-      static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor) {
+      static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor,
+			   std::list<AST::node*>::iterator& t_further) {
 	bool retval = false;
 	std::list<node*>::iterator save = t_cursor;
 	retval = for_<typename tree::Grammar::fetch<line>::grammarLine::node_line>::organize(t_ASTnodes, t_cursor);
@@ -109,11 +118,14 @@ namespace ctvscript {
 
     template<typename ASTnode>
     struct for_< tree::Compare<ASTnode> > {
-      static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor) {
+      static bool organize(std::list<node*> t_ASTnodes, std::list<node*>::iterator& t_cursor,
+			   std::list<AST::node*>::iterator& t_further) {
 	bool retval = false;
 	if (dynamic_cast<ASTnode>(*t_cursor) != nullptr) {
 	  retval = true;
 	  ++t_cursor;
+	  if (std::distance(t_further, t_cursor) > 0)
+	    t_further = t_cursor;
 	}
 	return (retval);
       }
