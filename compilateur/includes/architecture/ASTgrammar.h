@@ -17,7 +17,8 @@ namespace ctvscript {
       struct GrammarLine{
 	static const AST::tree::line_name name = line;
 	using node_line = superior_node;
-	static std::list<AST::node*> onResult(std::list<AST::node*>);
+	static std::list<AST::node*> onError(std::list<AST::node*> t_list) { return (t_list); }
+	static std::list<AST::node*> onMatch(std::list<AST::node*> t_list) { return (t_list); }
       };
 
 

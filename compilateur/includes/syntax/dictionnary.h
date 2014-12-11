@@ -12,7 +12,7 @@ namespace ctvscript {
 
     class syntax {
     public:
-      enum class identifier {
+      enum class identifier : unsigned char{
 	unknown
 	  , whitespace
 	  , new_line
@@ -23,12 +23,34 @@ namespace ctvscript {
 	  , else_statement
 	  , return_statement
 
+	  , typedef_statement
+
+	  , import_statement
+
+	  , namespace_statement
+	  , class_statement
+	  , public_statement
+	  , private_statement
+
 	  , semicolon
 	  , Bparenthesis, Eparenthesis
 	  , Bbrackets, Ebrackets
 	  , Bsqbrackets, Esqbrackets
 
-	  , operators_simbol
+	  , scope_resolution
+	  , increment
+	  , decrement
+	  , data_selection
+	  , data_selection
+
+	  , colon
+	  , addition
+	  , substraction
+	  , division
+	  , modulo
+	  , multiplication
+
+	  , type_id
 	  };
       struct dictionnary_member { std::regex m_match; size_t m_min_match_size; };
       static const std::map<syntax::identifier, syntax::dictionnary_member> dictionnary;

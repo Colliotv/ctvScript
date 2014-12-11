@@ -2,6 +2,8 @@
 
 #include "syntax/ASTparser.h"
 #include "syntax/dictionnary.h"
+
+#include "utils/exception.h"
 namespace ctvscript {
   namespace parser {
 
@@ -14,9 +16,8 @@ namespace ctvscript {
 	cursor_data _save(_cursor);
 	syntax::typed_response _identifier = syntax::get_next_word_type((syntax::cursor&)_cursor, _end);
 
-	_cursor.m_line += _save.distance(_cursor);
+	_cursor.m_column += _save.distance(_cursor);
 
-	std::cout << std::string( (std::string::const_iterator&)_save, (std::string::const_iterator&)_cursor);
 	switch (_identifier.first) {
 	case syntax::identifier::whitespace:
 	  break; //ignore
@@ -24,8 +25,8 @@ namespace ctvscript {
 	  _cursor.m_line += 1, _cursor.m_column = 0;
 	  break;
 	case syntax::identifier::unknown:
-	  /* throw an error*/
-	  std::cout << "unknown" << std::endl;
+	  throw exception::identification_error(utils::cursor_indicator(_cursor.m_line, _cursor.m_column),
+						utils::seize_line((syntax::cursor&)_cursor, t_file));
 	  break;
 	default:
 	  /* create node */
@@ -34,10 +35,8 @@ namespace ctvscript {
 	_save = _cursor;
 
 	while (syntax::next_word_is<syntax::identifier::whitespace>(_cursor.m_cursor, _end));
-	std::cout << std::string( (std::string::const_iterator&)_save, (std::string::const_iterator&)_cursor);
-	_cursor.m_line += _save.distance(_cursor);
+	_cursor.m_column += _save.distance(_cursor);
       }
-      std::cout << std::endl;
       return (_list);
     }
 
