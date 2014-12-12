@@ -6,34 +6,42 @@ namespace ctvscript {
   namespace parser {
 
     const std::map<syntax::identifier, syntax::dictionnary_member> syntax::dictionnary({
-	{syntax::identifier::whitespace,	{VARIABLE_REGEX("( |\t)+")}},
-	{syntax::identifier::new_line,		{VARIABLE_REGEX("(\r\n|\n)+")}},
+	{syntax::identifier::whitespace,		{VARIABLE_REGEX("( |\t)+")}},
+	{syntax::identifier::new_line,			{VARIABLE_REGEX("(\r\n|\n)+")}},
 
-	{syntax::identifier::variable,		{SOLID_REGEX("var")}},
-	{syntax::identifier::function,		{SOLID_REGEX("def")}},
+	{syntax::identifier::variable,			{SOLID_REGEX("var")}},
+	{syntax::identifier::function,			{SOLID_REGEX("def")}},
 
-	{syntax::identifier::if_statement,	{SOLID_REGEX("if")}},
-	{syntax::identifier::else_statement,	{SOLID_REGEX("else")}},
-	{syntax::identifier::else_statement,	{SOLID_REGEX("else")}},
-	{syntax::identifier::return_statement,	{SOLID_REGEX("return")}},
+	{syntax::identifier::if_statement,		{SOLID_REGEX("if")}},
+	{syntax::identifier::else_statement,		{SOLID_REGEX("else")}},
+	{syntax::identifier::else_statement,		{SOLID_REGEX("else")}},
+	{syntax::identifier::return_statement,		{SOLID_REGEX("return")}},
 
-	{syntax::identifier::typedef_statement,	{SOLID_REGEX("typedef")}},
+	{syntax::identifier::typedef_statement,		{SOLID_REGEX("typedef")}},
 
-	{syntax::identifier::import_statement,	{SOLID_REGEX("import")}},
+	{syntax::identifier::import_statement,		{SOLID_REGEX("import")}},
 
-	{syntax::identifier::class_statement,	{SOLID_REGEX("class")}},
-	{syntax::identifier::public_statement,	{SOLID_REGEX("public")}},
-	{syntax::identifier::private_statement,	{SOLID_REGEX("private")}},
+	{syntax::identifier::namespace_statement,	{SOLID_REGEX("namespace")}},
+	{syntax::identifier::class_statement,		{SOLID_REGEX("class")}},
+	{syntax::identifier::public_statement,		{SOLID_REGEX("public")}},
+	{syntax::identifier::private_statement,		{SOLID_REGEX("private")}},
 
-	{syntax::identifier::semicolon,		{VARIABLE_REGEX(";+")}},
-	{syntax::identifier::Bparenthesis,	{SOLID_REGEX("\\(")}},
-	{syntax::identifier::Eparenthesis,	{SOLID_REGEX("\\)")}},
-	{syntax::identifier::Bbrackets,		{SOLID_REGEX("\\{")}},
-	{syntax::identifier::Ebrackets,		{SOLID_REGEX("\\}")}},
-	{syntax::identifier::Bsqbrackets,	{SOLID_REGEX("\\[")}},
-	{syntax::identifier::Esqbrackets,	{SOLID_REGEX("\\]")}},
+	{syntax::identifier::semicolon,			{VARIABLE_REGEX(";+")}},
+	{syntax::identifier::Bparenthesis,		{VARIABLE_REGEX("\\(")}},
+	{syntax::identifier::Eparenthesis,		{VARIABLE_REGEX("\\)")}},
+	{syntax::identifier::Bbrackets,			{VARIABLE_REGEX("\\{")}},
+	{syntax::identifier::Ebrackets,			{VARIABLE_REGEX("}")}},
+	{syntax::identifier::Bsqbrackets,		{VARIABLE_REGEX("\\[")}},
+	{syntax::identifier::Esqbrackets,		{VARIABLE_REGEX("]")}},
 
-	{syntax::identifier::plus,	{SOLID_REGEX("\\]")}},
+	{syntax::identifier::scope_resolution,		{VARIABLE_REGEX("::")}},
+	{syntax::identifier::increment,			{VARIABLE_REGEX("\\+\\+")}},
+	{syntax::identifier::decrement,			{VARIABLE_REGEX("--")}},
+	{syntax::identifier::struct_dereference,	{VARIABLE_REGEX("\\.")}},
+	{syntax::identifier::struct_reference,		{VARIABLE_REGEX("->")}},
+
+	{syntax::identifier::addition,			{VARIABLE_REGEX("\\+")}},
+	{syntax::identifier::substraction,		{VARIABLE_REGEX("-")}},
 
       });
 

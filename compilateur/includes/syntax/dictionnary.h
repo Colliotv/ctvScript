@@ -40,8 +40,8 @@ namespace ctvscript {
 	  , scope_resolution
 	  , increment
 	  , decrement
-	  , data_selection
-	  , data_selection
+	  , struct_dereference
+	  , struct_reference
 
 	  , colon
 	  , addition
