@@ -3,9 +3,10 @@
 
 # include <regex>
 # include <map>
+# include <list>
 
-# define VARIABLE_REGEX(__string__)	std::regex(__string__), 1
-# define  SOLID_REGEX(__string__)	std::regex(__string__), sizeof(__string__) - 1
+# define VARIABLE_REGEX(__string__)	std::regex(__string__, std::regex::optimize), 1
+# define  SOLID_REGEX(__string__)	std::regex(__string__, std::regex::optimize), sizeof(__string__) - 1
 
 namespace ctvscript {
   namespace parser{
@@ -40,6 +41,7 @@ namespace ctvscript {
 	  , scope_resolution
 	  , increment
 	  , decrement
+
 	  , struct_dereference
 	  , struct_reference
 
@@ -50,10 +52,15 @@ namespace ctvscript {
 	  , modulo
 	  , multiplication
 
+	  , string_litteral
+	  , char_litteral
+	  , floating
+	  , integer
 	  , type_id
 	  };
       struct dictionnary_member { std::regex m_match; size_t m_min_match_size; };
-      static const std::map<syntax::identifier, syntax::dictionnary_member> dictionnary;
+      static const std::map<syntax::identifier, syntax::dictionnary_member>		dictionnary;
+      static const std::map<syntax::identifier, std::list<syntax::dictionnary_member> > composed_dictionnary;
 
       typedef std::string::const_iterator		 cursor;
       typedef const std::string::const_iterator		 file_end;

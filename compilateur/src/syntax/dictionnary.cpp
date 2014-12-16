@@ -5,9 +5,14 @@
 namespace ctvscript {
   namespace parser {
 
+    const std::map< syntax::identifier, std::list<syntax::dictionnary_member> > syntax::composed_dictionnary({
+	{syntax::identifier::string_litteral,	{ {SOLID_REGEX("\"")}, {VARIABLE_REGEX("[^\"]*")}, {SOLID_REGEX("\"")} }},
+	{syntax::identifier::char_litteral,	{ {SOLID_REGEX("'")}, {VARIABLE_REGEX("[^']")}, {SOLID_REGEX("'")} }},
+	{syntax::identifier::floating,		{ {SOLID_REGEX("[[:d:]]*")}, {VARIABLE_REGEX("\\.")}, {SOLID_REGEX("[[:d:]]*")} }},
+      });
     const std::map<syntax::identifier, syntax::dictionnary_member> syntax::dictionnary({
-	{syntax::identifier::whitespace,		{VARIABLE_REGEX("( |\t)+")}},
 	{syntax::identifier::new_line,			{VARIABLE_REGEX("(\r\n|\n)+")}},
+	{syntax::identifier::whitespace,		{VARIABLE_REGEX("[[:blank:]]+")}},
 
 	{syntax::identifier::variable,			{SOLID_REGEX("var")}},
 	{syntax::identifier::function,			{SOLID_REGEX("def")}},
@@ -37,12 +42,19 @@ namespace ctvscript {
 	{syntax::identifier::scope_resolution,		{VARIABLE_REGEX("::")}},
 	{syntax::identifier::increment,			{VARIABLE_REGEX("\\+\\+")}},
 	{syntax::identifier::decrement,			{VARIABLE_REGEX("--")}},
+
 	{syntax::identifier::struct_dereference,	{VARIABLE_REGEX("\\.")}},
 	{syntax::identifier::struct_reference,		{VARIABLE_REGEX("->")}},
 
+	{syntax::identifier::colon,			{VARIABLE_REGEX(":")}},
 	{syntax::identifier::addition,			{VARIABLE_REGEX("\\+")}},
 	{syntax::identifier::substraction,		{VARIABLE_REGEX("-")}},
+	{syntax::identifier::division,			{VARIABLE_REGEX("/")}},
+	{syntax::identifier::multiplication,		{VARIABLE_REGEX("\\*")}},
+	{syntax::identifier::modulo,			{VARIABLE_REGEX("%")}},
 
+	{syntax::identifier::integer,			{VARIABLE_REGEX("([0-9])+(([a-z]|[A-Z])|[0-9])*")}},
+	{syntax::identifier::type_id,			{VARIABLE_REGEX("([a-z]|[A-Z])+(([a-z]|[A-Z])|[0-9])*")}},
       });
 
     bool
@@ -58,7 +70,10 @@ namespace ctvscript {
 
       if ((size_t)std::distance(t_cursor, _advance) != t_member.m_min_match_size
 	  && std::distance(t_cursor, _advance) > 0) {
-	t_cursor = _advance;
+	if (_advance != t_end)
+	  t_cursor = --_advance;
+	else
+	  t_cursor = _advance;
 	return (true);
       }
       return (false);
@@ -67,6 +82,19 @@ namespace ctvscript {
     const syntax::typed_response
     syntax::get_next_word_type(cursor& t_cursor, file_end t_end) {
       cursor pos = t_cursor;
+      for (auto _member_list : composed_dictionnary) {
+	bool is_composed = (_member_list.second.size() > 0);
+	for (auto _member : _member_list.second) {
+	  if (!check_in_syntax(t_cursor, t_end, _member)) {
+	    is_composed = false;
+	    break;
+	  }
+	}
+	if (!is_composed)
+	  t_cursor = pos;
+	else
+	  return (std::pair<const syntax::identifier, const std::string>(_member_list.first, std::string(pos, t_cursor)));
+      }
       for (auto _member : dictionnary) {
 	if (check_in_syntax(t_cursor, t_end, _member.second)) {
 	  return (std::pair<const syntax::identifier, const std::string>(_member.first, std::string(pos, t_cursor)));

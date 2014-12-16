@@ -1,3 +1,4 @@
+#include <iostream>
 #include "architecture/ASTgrammar.h"
 
 
@@ -22,7 +23,7 @@ namespace ctvscript {
       };
 
       template<bool... retvals>
-      static void void_() {}
+      static void void_(...) {}
 
       static void list_modifier(std::list<AST::node*>& t_list,
 				std::list<AST::node*>::iterator t_fcut,
@@ -53,7 +54,7 @@ namespace ctvscript {
 	bool retval = false;
 	std::list<node*>::iterator save = t_cursor;
 
-	while (for_<tree_node>::organize(t_ASTnodes, t_cursor))
+	while (for_<tree_node>::organize(t_ASTnodes, t_cursor, t_further))
 	  retval = true;
 
 	if (!retval)
@@ -75,9 +76,9 @@ namespace ctvscript {
 	  bool retval = false;
 	  std::list<node*>::iterator save = t_cursor;
 	  utils::void_(
-		(retval || for_<nodes>::organize(t_ASTnodes, t_cursor) ?
-		 (retval = true) :
-		 (false))...
+		       (retval || for_<nodes>::organize(t_ASTnodes, t_cursor, t_further) ?
+			(retval = true) :
+			(false))...
 		);
 	  if (!retval)
 	    t_cursor = save;
@@ -88,7 +89,7 @@ namespace ctvscript {
     public:
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	return sub_<utils::variadic_template_inverter<nodes...> >::organize(t_ASTnodes, t_cursor);
+	return sub_< typename utils::variadic_template_inverter<nodes...>::line >::organize(t_ASTnodes, t_cursor, t_further);
       }
     };
 
@@ -104,7 +105,7 @@ namespace ctvscript {
 	  bool inv_retval = true;
 	  std::list<node*>::iterator save = t_cursor;
 	  utils::void_(
-		(!inv_retval || for_<nodes>::organize(t_ASTnodes, t_cursor) ?
+		       (!inv_retval || for_<nodes>::organize(t_ASTnodes, t_cursor, t_further) ?
 		 (true) :
 		 (inv_retval = false))...
 		);
@@ -117,7 +118,7 @@ namespace ctvscript {
     public:
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	return sub_<utils::variadic_template_inverter<nodes...> >::organize(t_ASTnodes, t_cursor);
+	return sub_<typename utils::variadic_template_inverter<nodes...>::list >::organize(t_ASTnodes, t_cursor, t_further);
       }
     };
 
@@ -127,7 +128,7 @@ namespace ctvscript {
 			   std::list<AST::node*>::iterator& t_further) {
 	bool retval = false;
 	std::list<node*>::iterator save = t_cursor;
-	retval = for_<typename tree::Grammar::fetch<line>::grammarLine::node_line>::organize(t_ASTnodes, t_cursor);
+	retval = for_<typename tree::Grammar::fetch<line>::grammarLine::node_line>::organize(t_ASTnodes, t_cursor, t_further);
 	if (!retval) {
 	  t_cursor = save;
 	  utils::list_modifier(t_ASTnodes, save, t_further, tree::Grammar::fetch<line>::grammarLine::onError);
@@ -153,5 +154,11 @@ namespace ctvscript {
       }
     };
 
+    void launch_grammar(std::list<node*>& t_ASTnodes) {
+      std::list<node*>::iterator t_cursor = t_ASTnodes.begin();
+      std::list<node*>::iterator t_further = t_ASTnodes.begin();
+      if (for_< tree::Call<AST::tree::line_name::global> >::organize(t_ASTnodes, t_cursor, t_further))
+	std::cerr << "fail in grammar structuring" << std::endl;
+    }
   };
 };

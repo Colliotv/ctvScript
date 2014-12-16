@@ -1,5 +1,6 @@
 #ifndef ASTgrammar_h__
 # define ASTgrammar_h__
+# define INCLUDED_FROM_ASTGRAMMAR
 
 # include <list>
 
@@ -9,9 +10,7 @@ namespace ctvscript {
   namespace AST {
     namespace tree{
 
-      enum class line_name{
-	global, blob
-      };
+      # include "grammar/line.h"
 
       template<AST::tree::line_name line, typename superior_node>
       struct GrammarLine{
@@ -69,7 +68,7 @@ namespace ctvscript {
       template<AST::tree::line_name line>
       struct Call{};
 
-      typedef GrammarTree<GrammarLine<line_name::global, And<Call<line_name::global>, Call<line_name::blob> > > > Grammar; 
+      # include "grammar/grammar.h"
     };
 
 
@@ -90,4 +89,5 @@ namespace ctvscript {
   };
 };
 
+# undef INCLUDED_FROM_ASTGRAMMAR
 #endif
