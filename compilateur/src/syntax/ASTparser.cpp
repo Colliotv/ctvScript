@@ -29,7 +29,15 @@ namespace ctvscript {
 						utils::seize_line((syntax::cursor&)_cursor, t_file));
 	  break;
 	default:
-	  /* create node */
+	  std::string _syntax((syntax::cursor&)_save, (syntax::cursor&)_cursor);
+	  AST::node* new_node = AST::factory::create_node_by_syntax(_identifier.first, _syntax,
+								    AST::node::syntax(utils::seize_line((syntax::cursor&)_cursor,
+													t_file), 
+										      _save.m_line, _save.m_column));
+	  if (new_node == nullptr)
+	    std::cerr << "for syntax::identifier("<< static_cast<int>(_identifier.first)
+		      <<") and _syntax("<< _syntax
+		      <<"): factory don't recognized it (== TODO)" << std::endl;
 	  break;
 	}
 	_save = _cursor;

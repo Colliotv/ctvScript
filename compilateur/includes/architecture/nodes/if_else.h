@@ -4,12 +4,22 @@
 #  error "this file should be inclued only in architecture/ASTnode.h"
 # endif
 
-class If : AST::node{
+class If : public AST::node{
+public:
   static const parser::syntax::identifier syntax_identifier = parser::syntax::identifier::if_statement;
+
+public:
+  If(const std::string& t_file_line, const node::syntax& t_node_syntax)
+    : AST::node(t_file_line, t_node_syntax){}
 };
 
-class Else : AST::node{
+class Else : public AST::node{
+public:
   static const parser::syntax::identifier syntax_identifier = parser::syntax::identifier::else_statement;
+
+public:
+  Else(const std::string& t_file_line, const node::syntax& t_node_syntax)
+    : AST::node(t_file_line, t_node_syntax){}
 };
 
 #endif

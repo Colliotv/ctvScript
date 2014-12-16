@@ -2,25 +2,39 @@
 
 namespace ctvscript {
   namespace AST {
-    const std::map< parser::syntax::identifier, std::function<AST::node*()> >
-    factory::m_syntax_ASTallocator(make_ASTallocator<SYNTAX_BUILDABLE_NODE_LIST>());
 
+    /* ##  Node:: syntax  ## */
+    node::syntax::syntax(const std::string& t_file_line, std::size_t t_column, std::size_t t_line)
+      : m_file_line(t_file_line), m_column(t_column), m_line(t_line) {}
+
+    /* ## Node:: Ctor ## */
+    node::node(const std::string& t_file_line, const node::syntax& t_syntax)
+      : m_file_line(t_file_line), m_syntax(t_syntax) {}
+
+    /* ## Factory:: syntax_map ## */
     template<typename __node>
-    static AST::node* make_node() { return new __node(); }
+    static AST::node* make_node(const std::string& t_file_line, const node::syntax& t_node_syntax) {
+      return new __node(t_file_line, t_node_syntax);
+    }
 
     template<typename ... __nodes>
-    std::map< parser::syntax::identifier, std::function<AST::node*()> > factory::make_ASTallocator() {
-      std::array< parser::syntax::identifier,	sizeof...(__nodes)> keys({
-	  __nodes::syntax_identifier...
-	    });
-      std::array<std::function<AST::node*()>,	sizeof...(__nodes)> values({
-	  make_node<__nodes> ...
-	    });
-      std::map< parser::syntax::identifier, std::function<AST::node*()> > retval;
-      for (size_t i = 0; i < sizeof ... (__nodes); ++i) {
-	retval.emplace(keys[i], values[i]);
-      }
+    std::map< parser::syntax::identifier, std::function<AST::node*(const std::string&, const node::syntax&)> >
+	make_ASTallocator() {
+      std::map< parser::syntax::identifier, std::function<AST::node*(const std::string&, const node::syntax&)> > retval({
+	  {parser::syntax::identifier(__nodes::syntax_identifier),  make_node<__nodes>}...
+	});
       return retval;
+    }
+
+    const std::map< parser::syntax::identifier, std::function<AST::node*(const std::string&, const node::syntax&)> >
+    factory::m_syntax_ASTallocator(make_ASTallocator<SYNTAX_BUILDABLE_NODE_LIST>());
+
+    /* ## Factory:: create_node_by_syntax ## */
+    AST::node* AST::factory::create_node_by_syntax(parser::syntax::identifier t_identifier
+						   , const std::string& t_file_line, const node::syntax& t_node_syntax) {
+      if (m_syntax_ASTallocator.find(t_identifier) == m_syntax_ASTallocator.end())
+	return (nullptr);
+      return (m_syntax_ASTallocator.at(t_identifier)(t_file_line, t_node_syntax));
     }
   };
 };

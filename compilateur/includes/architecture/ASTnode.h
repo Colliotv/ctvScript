@@ -4,12 +4,11 @@
 
 # include <map>
 
-#include "syntax/dictionnary.h"
+# include "syntax/dictionnary.h"
 /*
  * Here is defined the majority of AST nodes
  * implemntation are done in src
  */
-
 namespace ctvscript {
   namespace AST {
     /*
@@ -17,7 +16,23 @@ namespace ctvscript {
      */
     class node {
     public:
+      class syntax {
+      private:
+	const std::string	m_file_line;
+	const std::size_t	m_column;
+	const std::size_t	m_line;
+
+      public:
+	syntax(const std::string&, std::size_t, std::size_t);
+      };
       static const parser::syntax::identifier syntax_identifier = parser::syntax::identifier::unknown;
+
+    public:
+      node(const std::string&, const node::syntax&);
+
+    private:
+      const std::string&	m_file_line;
+      const node::syntax&	m_syntax;
     };
 
     /*
@@ -32,7 +47,7 @@ namespace ctvscript {
 
       #include "nodes/if_else.h"
       class If;		//: AST::node{}; 
-      class Else;		//: AST::node{}; 
+      class Else;	//: AST::node{}; 
 
       #include "nodes/return.h"
       class Return;	//: AST::node{};
@@ -66,20 +81,23 @@ namespace ctvscript {
       class Ebracket;	 //: AST::node{};
 
       #include "nodes/squarebrackets.h"
-      class Bsqbrackets; //: AST::node{};
-      class Esqbrackets; //: AST::node{};
+      class Bsqbracket; //: AST::node{};
+      class Esqbracket; //: AST::node{};
     };
 
-# define SYNTAX_BUILDABLE_NODE_LIST	\
-    Var,				\
-      Fun,				\
-      If, Else,				\
-      Return,				\
-      Typedef,				\
-      Import,				\
-      SemiColon,			\
-      Bparenthesis, Eparenthesis,	\
-      Bbracket, Ebracket		\
+# define SYNTAX_BUILDABLE_NODE_LIST				\
+    keyword::Var,						\
+      keyword::Fun,						\
+      keyword::If, keyword::Else,				\
+      keyword::Return,						\
+      keyword::Typedef,						\
+      keyword::Import,						\
+      keyword::Namespace,					\
+      keyword::Class, keyword::Public, keyword::Private,	\
+      symbol::Semicolon,					\
+      symbol::Bparenthesis, symbol::Eparenthesis,		\
+      symbol::Bbracket, symbol::Ebracket,			\
+      symbol::Bsqbracket, symbol::Esqbracket
       
 
     /*
@@ -89,10 +107,11 @@ namespace ctvscript {
      */
     class factory {
     private:
-      template<class ... nodes>
-      static std::map< parser::syntax::identifier, std::function<AST::node*()> > make_ASTallocator();
+      static const std::map<parser::syntax::identifier, std::function<AST::node*(const std::string&, const node::syntax&)> >
+	m_syntax_ASTallocator;
 
-      static const std::map<parser::syntax::identifier, std::function<AST::node*()>> m_syntax_ASTallocator;
+    public:
+      static AST::node* create_node_by_syntax(parser::syntax::identifier, const std::string&, const node::syntax&);
     };
   };
 };

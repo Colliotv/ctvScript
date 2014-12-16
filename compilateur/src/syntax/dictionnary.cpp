@@ -10,6 +10,7 @@ namespace ctvscript {
 	{syntax::identifier::char_litteral,	{ {SOLID_REGEX("'")}, {VARIABLE_REGEX("[^']")}, {SOLID_REGEX("'")} }},
 	{syntax::identifier::floating,		{ {SOLID_REGEX("[[:d:]]*")}, {VARIABLE_REGEX("\\.")}, {SOLID_REGEX("[[:d:]]*")} }},
       });
+
     const std::map<syntax::identifier, syntax::dictionnary_member> syntax::dictionnary({
 	{syntax::identifier::new_line,			{VARIABLE_REGEX("(\r\n|\n)+")}},
 	{syntax::identifier::whitespace,		{VARIABLE_REGEX("[[:blank:]]+")}},
