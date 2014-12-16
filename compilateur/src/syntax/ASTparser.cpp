@@ -7,10 +7,10 @@
 namespace ctvscript {
   namespace parser {
 
-    std::list<AST::node> ASTparser::parse(const std::string& t_file) {
+    std::list<AST::node*> ASTparser::parse(const std::string& t_file) {
       cursor_data	_cursor(t_file.cbegin(), 0, 0);
       syntax::file_end	_end = t_file.cend();
-      std::list<AST::node> _list;
+      std::list<AST::node*> _list;
 
       while (_cursor != _end) {
 	cursor_data _save(_cursor);
@@ -35,9 +35,12 @@ namespace ctvscript {
 													t_file), 
 										      _save.m_line, _save.m_column));
 	  if (new_node == nullptr)
-	    std::cerr << "for syntax::identifier("<< static_cast<int>(_identifier.first)
-		      <<") and _syntax("<< _syntax
-		      <<"): factory don't recognized it (== TODO)" << std::endl;
+	    throw exception::identification_error(utils::cursor_indicator(_cursor.m_line, _cursor.m_column),
+						  utils::seize_line((syntax::cursor&)_cursor, t_file));
+	  _list.push_back(new_node);
+	  std::cerr << "for syntax::identifier("<< static_cast<int>(_identifier.first)
+		    <<") and _syntax("<< _syntax
+		    <<"): factory recognized it (== TODO)" << std::endl;
 	  break;
 	}
 	_save = _cursor;

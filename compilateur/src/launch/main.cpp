@@ -4,7 +4,7 @@
 int main() {
   int retval = 0;
   try {
-    ctvscript::parser::ASTparser::parse("var var'a' -- / * var var var + var \"vaar\"				");
+    ctvscript::parser::ASTparser::parse("var var'a' -- / * var var variable1 var + var \"vaar\"				");
   } catch (const std::logic_error& e) {
     retval = 1;
     std::cout

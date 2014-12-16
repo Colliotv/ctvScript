@@ -38,7 +38,21 @@ namespace ctvscript {
 	  , Bbrackets, Ebrackets
 	  , Bsqbrackets, Esqbrackets
 
+	  , new_statement
+	  , delete_statement
+
 	  , scope_resolution
+
+	  , binary_left_shift
+	  , binary_right_shift
+
+	  , and_symbol
+	  , or_symbol
+
+	  , inferior_equal
+	  , superior_equal
+	  , equality
+
 	  , increment
 	  , decrement
 
@@ -46,11 +60,20 @@ namespace ctvscript {
 	  , struct_reference
 
 	  , colon
+
+	  , binary_and
+	  , binary_or
+
+	  , inferior
+	  , superior
+
 	  , addition
 	  , substraction
 	  , division
 	  , modulo
 	  , multiplication
+
+	  , assignement
 
 	  , string_litteral
 	  , char_litteral

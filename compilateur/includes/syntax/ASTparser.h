@@ -12,7 +12,7 @@ namespace ctvscript {
 
     class ASTparser {
     public:
-      static std::list<AST::node> parse(const std::string& file);
+      static std::list<AST::node*> parse(const std::string& file);
     };
 
   };

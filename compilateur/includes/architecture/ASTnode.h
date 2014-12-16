@@ -63,6 +63,7 @@ namespace ctvscript {
       class Class;
       class Public;
       class Private;
+
     };
 
     /*
@@ -71,6 +72,9 @@ namespace ctvscript {
     namespace symbol {
       #include "nodes/semicolon.h"
       class Semicolon;	 //: AST::node{};
+
+      #include "nodes/colon.h"
+      class Colon;	 //: AST::node{};
 
       #include "nodes/parenthesis.h"
       class Bparenthesis;//: AST::node{};
@@ -85,20 +89,89 @@ namespace ctvscript {
       class Esqbracket; //: AST::node{};
     };
 
-# define SYNTAX_BUILDABLE_NODE_LIST				\
-    keyword::Var,						\
-      keyword::Fun,						\
-      keyword::If, keyword::Else,				\
-      keyword::Return,						\
-      keyword::Typedef,						\
-      keyword::Import,						\
-      keyword::Namespace,					\
-      keyword::Class, keyword::Public, keyword::Private,	\
-      symbol::Semicolon,					\
-      symbol::Bparenthesis, symbol::Eparenthesis,		\
-      symbol::Bbracket, symbol::Ebracket,			\
-      symbol::Bsqbracket, symbol::Esqbracket
-      
+    /*
+     * Operands
+     */
+    namespace operands {
+      #include "nodes/allocators_operands.h"
+      class New;	 //: AST::node{};
+      class Delete;	 //: AST::node{};
+
+      #include "nodes/binary_operators.h"
+      class Binary_and;	 //: AST::node{};
+      class Binary_or;	 //: AST::node{};
+      class Binary_left_shift;	 //: AST::node{};
+      class Binary_right_shift;	 //: AST::node{};
+
+      #include "nodes/assignement.h"
+      class Assignement;
+
+      #include "nodes/mathematical_operators.h"
+      class Addition;		//: AST::node{};
+      class Substraction;	//: AST::node{};
+      class Division;		//: AST::node{};
+      class Modulo;		//: AST::node{};
+      class Multiplication;	//: AST::node{};
+
+      #include "nodes/comparison.h"
+      class Or;
+      class And;
+
+      #include "nodes/bool_operators.h"
+      class Inferior;
+      class Inferior_equal;
+      class Superior;
+      class Superior_equal;
+      class Equality;
+    };
+
+    /*
+     * Values
+     */
+    namespace values {
+      #include "nodes/unspecified_typeid.h"
+      class Unspecified_typeid;	 //: AST::node{};
+
+      #include "nodes/string_litteral.h"
+      class String;
+      class Char;
+
+      #include "nodes/floating.h"
+      class Floating;
+
+      #include "nodes/integer.h"
+      class Integer;
+
+    }
+
+# define SYNTAX_BUILDABLE_NODE_LIST					\
+    keyword::Var,							\
+      keyword::Fun,							\
+      keyword::If, keyword::Else,					\
+      keyword::Return,							\
+      keyword::Typedef,							\
+      keyword::Import,							\
+      keyword::Namespace,						\
+      keyword::Class, keyword::Public, keyword::Private,		\
+      symbol::Semicolon,						\
+      symbol::Colon,							\
+      symbol::Bparenthesis, symbol::Eparenthesis,			\
+      symbol::Bbracket, symbol::Ebracket,				\
+      symbol::Bsqbracket, symbol::Esqbracket,				\
+      operands::New, operands::Delete,					\
+      operands::Binary_and, operands::Binary_or,			\
+      operands::Binary_left_shift, operands::Binary_right_shift,	\
+      operands::Assignement,						\
+      operands::Addition, operands::Substraction,			\
+      operands::Multiplication,						\
+      operands::Division, operands::Modulo,				\
+      operands::Or, operands::And,					\
+      operands::Inferior, operands::Inferior_equal,			\
+      operands::Superior, operands::Superior_equal,			\
+      operands::Equality,						\
+      values::Unspecified_typeid,					\
+      values::String, values::Char,					\
+      values::Floating, values::Integer
 
     /*
      * The Factory help in two way: 

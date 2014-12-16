@@ -81,8 +81,10 @@ namespace ctvscript {
     }
 
     const syntax::typed_response
-    syntax::get_next_word_type(cursor& t_cursor, file_end t_end) {
+	syntax::get_next_word_type(cursor& t_cursor, file_end t_end) {
       cursor pos = t_cursor;
+      std::pair<syntax::identifier, std::string> retval(identifier::unknown, "");
+
       for (auto _member_list : composed_dictionnary) {
 	bool is_composed = (_member_list.second.size() > 0);
 	for (auto _member : _member_list.second) {
@@ -96,12 +98,19 @@ namespace ctvscript {
 	else
 	  return (std::pair<const syntax::identifier, const std::string>(_member_list.first, std::string(pos, t_cursor)));
       }
+      size_t max_word_length = 0;
+      cursor save_further = t_cursor;
       for (auto _member : dictionnary) {
-	if (check_in_syntax(t_cursor, t_end, _member.second)) {
-	  return (std::pair<const syntax::identifier, const std::string>(_member.first, std::string(pos, t_cursor)));
+	bool result = check_in_syntax(t_cursor, t_end, _member.second);
+	if (result && (size_t)std::distance(pos, t_cursor) > max_word_length) {
+	  max_word_length = std::distance(pos, t_cursor);
+	  save_further = t_cursor;
+	  retval = std::pair<syntax::identifier, std::string>(_member.first, std::string(pos, t_cursor));
 	}
+	t_cursor = pos;
       }
-      return (std::make_pair<const syntax::identifier, const std::string>(identifier::unknown, ""));
+      t_cursor = save_further;
+      return (retval);
     }
 
   };
