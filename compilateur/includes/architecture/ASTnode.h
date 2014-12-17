@@ -30,6 +30,9 @@ namespace ctvscript {
     public:
       node(const std::string&, const node::syntax&);
 
+    public:
+      virtual node::syntax get_syntax() { return m_syntax; }
+
     private:
       const std::string&	m_file_line;
       const node::syntax&	m_syntax;
@@ -76,6 +79,9 @@ namespace ctvscript {
       #include "nodes/colon.h"
       class Colon;	 //: AST::node{};
 
+      #include "nodes/comma.h"
+      class Comma;
+
       #include "nodes/parenthesis.h"
       class Bparenthesis;//: AST::node{};
       class Eparenthesis;//: AST::node{};
@@ -112,17 +118,19 @@ namespace ctvscript {
       class Division;		//: AST::node{};
       class Modulo;		//: AST::node{};
       class Multiplication;	//: AST::node{};
+      class Decrement;		//: AST::node{};
+      class Increment;		//: AST::node{};
 
       #include "nodes/comparison.h"
-      class Or;
-      class And;
+      class Or;			//: AST::node{};
+      class And;		//: AST::node{};
 
       #include "nodes/bool_operators.h"
-      class Inferior;
-      class Inferior_equal;
-      class Superior;
-      class Superior_equal;
-      class Equality;
+      class Inferior;		//: AST::node{};
+      class Inferior_equal;	//: AST::node{};
+      class Superior;		//: AST::node{};
+      class Superior_equal;	//: AST::node{};
+      class Equality;		//: AST::node{};
     };
 
     /*
@@ -165,6 +173,7 @@ namespace ctvscript {
       operands::Addition, operands::Substraction,			\
       operands::Multiplication,						\
       operands::Division, operands::Modulo,				\
+      operands::Decrement, operands::Increment,				\
       operands::Or, operands::And,					\
       operands::Inferior, operands::Inferior_equal,			\
       operands::Superior, operands::Superior_equal,			\

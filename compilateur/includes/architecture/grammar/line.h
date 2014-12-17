@@ -5,7 +5,7 @@
 # endif
 
 enum class line_name{
-  global,
+  global, function_definition
 };
 
 #endif

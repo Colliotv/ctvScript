@@ -1,10 +1,13 @@
 #include <iostream>
 
 # include "syntax/ASTparser.h"
+# include "architecture/ASTgrammar.h"
 int main() {
   int retval = 0;
   try {
-    ctvscript::parser::ASTparser::parse("var var'a' -- / * var var variable1 var + var \"vaar\"				");
+    std::list<ctvscript::AST::node*> nodeList;
+    ctvscript::parser::ASTparser::parse("def int toto()", nodeList);
+    launch_grammar(nodeList);
   } catch (const std::logic_error& e) {
     retval = 1;
     std::cout

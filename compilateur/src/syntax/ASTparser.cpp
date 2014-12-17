@@ -7,10 +7,9 @@
 namespace ctvscript {
   namespace parser {
 
-    std::list<AST::node*> ASTparser::parse(const std::string& t_file) {
+    void ASTparser::parse(const std::string& t_file, std::list<AST::node*>& _list) {
       cursor_data	_cursor(t_file.cbegin(), 0, 0);
       syntax::file_end	_end = t_file.cend();
-      std::list<AST::node*> _list;
 
       while (_cursor != _end) {
 	cursor_data _save(_cursor);
@@ -25,7 +24,7 @@ namespace ctvscript {
 	  _cursor.m_line += 1, _cursor.m_column = 0;
 	  break;
 	case syntax::identifier::unknown:
-	  throw exception::identification_error(utils::cursor_indicator(_cursor.m_line, _cursor.m_column),
+	  throw exception::identification_error(utils::cursor_indicator(_save.m_line, _save.m_column),
 						utils::seize_line((syntax::cursor&)_cursor, t_file));
 	  break;
 	default:
@@ -35,20 +34,16 @@ namespace ctvscript {
 													t_file), 
 										      _save.m_line, _save.m_column));
 	  if (new_node == nullptr)
-	    throw exception::identification_error(utils::cursor_indicator(_cursor.m_line, _cursor.m_column),
+	    throw exception::identification_error(utils::cursor_indicator(_save.m_line, _save.m_column),
 						  utils::seize_line((syntax::cursor&)_cursor, t_file));
 	  _list.push_back(new_node);
 	  std::cerr << "for syntax::identifier("<< static_cast<int>(_identifier.first)
-		    <<") and _syntax("<< _syntax
-		    <<"): factory recognized it (== TODO)" << std::endl;
+		    <<") and _syntax( "<< _syntax
+		    <<" ): factory recognized it (== NOT TODO)" << std::endl;
 	  break;
 	}
 	_save = _cursor;
-
-	while (syntax::next_word_is<syntax::identifier::whitespace>(_cursor.m_cursor, _end));
-	_cursor.m_column += _save.distance(_cursor);
       }
-      return (_list);
     }
 
   };

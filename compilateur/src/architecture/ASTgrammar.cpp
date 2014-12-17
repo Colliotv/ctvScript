@@ -7,21 +7,6 @@ namespace ctvscript {
     namespace tree{};
     namespace utils{
 
-      template<typename, typename>
-      struct variadic_append;
-      template<typename rev_head, typename ... rev_tail>
-      struct variadic_append<rev_head, std::tuple<rev_tail...> >
-      {	using list = std::tuple< rev_tail..., rev_head >; };
-
-      template<typename ... inverting>
-      struct variadic_template_inverter
-      {	using list = std::tuple<>; };
-
-      template<typename head, typename ... tail>
-      struct variadic_template_inverter<head, tail...> {
-	using list = typename variadic_append< head, typename variadic_template_inverter<tail...>::list >::list;
-      };
-
       template<bool... retvals>
       static void void_(...) {}
 
@@ -45,12 +30,15 @@ namespace ctvscript {
 	std::advance(t_fcut, 1);
 	t_list.insert(t_fcut, _list.cbegin(), _list.cend());
       }
+
     };
 
+    /* ########## REPEAT ############# */
     template<typename tree_node>
     struct for_< tree::Repeat<tree_node> > {
       static bool organize(std::list<node*>& t_ASTnodes, std::list<AST::node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
+	std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	bool retval = false;
 	std::list<node*>::iterator save = t_cursor;
 
@@ -61,67 +49,128 @@ namespace ctvscript {
 	  t_cursor = save;
 	return (retval);
       }
+    };
 
+    template<typename tree_node, size_t it_min>
+    struct for_< tree::Repeat<tree_node, it_min> > {
+      static bool organize(std::list<node*>& t_ASTnodes, std::list<AST::node*>::iterator& t_cursor,
+			   std::list<AST::node*>::iterator& t_further) {
+	std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	bool retval = false;
+	size_t it = 0;
+	std::list<node*>::iterator save = t_cursor;
+
+	while (for_<tree_node>::organize(t_ASTnodes, t_cursor, t_further)) {
+	  it++;
+	}
+	if (it >= it_min)
+	  retval = true;
+
+	if (!retval)
+	  t_cursor = save;
+	return (retval);
+      }
+    };
+
+    template<typename tree_node, size_t it_min, size_t it_max>
+    struct for_< tree::Repeat<tree_node, it_min, it_max> > {
+      static bool organize(std::list<node*>& t_ASTnodes, std::list<AST::node*>::iterator& t_cursor,
+			   std::list<AST::node*>::iterator& t_further) {
+	std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	bool retval = false;
+	size_t it = 0;
+	std::list<node*>::iterator save = t_cursor;
+
+	while (it < it_max && for_<tree_node>::organize(t_ASTnodes, t_cursor, t_further)) {
+	  it++;
+	}
+	if (it >= it_min)
+	  retval = true;
+
+	if (!retval)
+	  t_cursor = save;
+	return (retval);
+      }
+    };
+
+    /* ###### OR ###### */
+    template<typename... nodes>
+    struct _or;
+    template<> struct _or<>{
+      static bool calc(std::list<node*>&, std::list<node*>::iterator&, std::list<AST::node*>::iterator&) { return false; }
+    };
+    template<typename node_head, typename ... node_tail>
+    struct _or<node_head, node_tail...>{
+      static bool calc(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
+		       std::list<AST::node*>::iterator& t_further) {
+	if (for_<node_head>::organize(t_ASTnodes, t_cursor, t_further))
+	  return true;
+	return _or<node_tail...>::calc(t_ASTnodes, t_cursor, t_further);
+      }
     };
 
     template<typename... nodes>
     struct for_< tree::Or<nodes...> > {
-    private:
-      template<typename... _inverted>
-      struct sub_;
-      template<typename... _nodes> //prevent template reversion
-      struct sub_< std::tuple<_nodes...> > {
-	static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
-			     std::list<AST::node*>::iterator& t_further) {
-	  bool retval = false;
-	  std::list<node*>::iterator save = t_cursor;
-	  utils::void_(
-		       (retval || for_<nodes>::organize(t_ASTnodes, t_cursor, t_further) ?
-			(retval = true) :
-			(false))...
-		);
-	  if (!retval)
-	    t_cursor = save;
-	  return (retval);
-	}
-      };
-
     public:
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	return sub_< typename utils::variadic_template_inverter<nodes...>::line >::organize(t_ASTnodes, t_cursor, t_further);
+	std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	std::list<node*>::iterator save = t_cursor;
+	bool retval = _or<nodes...>::calc(t_ASTnodes, t_cursor, t_further);
+	if (!retval)
+	  t_cursor = save;
+	return (retval);
+      }
+    };
+
+
+    /* ######## AND ####### */
+    template<typename... nodes>
+    struct _and;
+    template<> struct _and<>{
+      static bool calc(std::list<node*>&, std::list<node*>::iterator&, std::list<AST::node*>::iterator&) { return true; }
+    };
+    template<typename node_head, typename ... node_tail>
+    struct _and<node_head, node_tail...>{
+      static bool calc(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
+		       std::list<AST::node*>::iterator& t_further) {
+	if (for_<node_head>::organize(t_ASTnodes, t_cursor, t_further)) {
+	  if (!_and<node_tail...>::calc(t_ASTnodes, t_cursor, t_further)) {
+	    std::cerr << "depile false" << std::endl;
+	    return false;
+	  } else {
+	    std::cerr << "depile true" << std::endl;
+	    return true;
+	  }
+	}
+	std::cerr << "return false" << std::endl << std::endl;
+	return (false);
       }
     };
 
     template<typename... nodes>
     struct for_< tree::And<nodes...> > {
-    private:
-      template<typename... _inverted>
-      struct sub_;
-      template<typename... _nodes>
-      struct sub_< std::tuple<_nodes...> > {
-	static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
-			     std::list<AST::node*>::iterator& t_further) {
-	  bool inv_retval = true;
-	  std::list<node*>::iterator save = t_cursor;
-	  utils::void_(
-		       (!inv_retval || for_<nodes>::organize(t_ASTnodes, t_cursor, t_further) ?
-		 (true) :
-		 (inv_retval = false))...
-		);
-	  if (inv_retval)
-	    t_cursor = save;
-	  return (!inv_retval);
-	}
-      };
-
     public:
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	return sub_<typename utils::variadic_template_inverter<nodes...>::list >::organize(t_ASTnodes, t_cursor, t_further);
+	std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	bool retval;
+	std::list<node*>::iterator save = t_cursor;
+	retval = _and<nodes...>::calc(t_ASTnodes, t_cursor, t_further);
+
+	if (!retval)
+	  std::cerr << "error in {"<< __PRETTY_FUNCTION__ << "}" << std::endl << std::endl;
+	else
+	  std::cerr << "clear in {"<< __PRETTY_FUNCTION__ << "}" << std::endl << std::endl;
+
+	if (!retval)
+	  t_cursor = save;
+	return (retval);
       }
     };
 
+
+    /* ######### CALL ########## */
     template<AST::tree::line_name line>
     struct for_< tree::Call<line> > {
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
@@ -139,25 +188,33 @@ namespace ctvscript {
       }
     };
 
+    /* ############ COMPARE ############ */
     template<typename ASTnode>
     struct for_< tree::Compare<ASTnode> > {
-      static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
+      static bool organize(std::list<node*>&, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
 	bool retval = false;
-	if (dynamic_cast<ASTnode>(*t_cursor) != nullptr) {
+	if (dynamic_cast<ASTnode*>(*t_cursor) != nullptr) {
 	  retval = true;
 	  ++t_cursor;
 	  if (std::distance(t_further, t_cursor) > 0)
 	    t_further = t_cursor;
 	}
+	if (!retval)
+	  std::cerr << "error in {"<< __PRETTY_FUNCTION__ << "}" << std::endl << std::endl;
+	else
+	  std::cerr << "clear in {"<< __PRETTY_FUNCTION__ << "}" << std::endl << std::endl;
+
 	return (retval);
       }
     };
 
+    # include "architecture/grammar/lines/index.hpp"
+
     void launch_grammar(std::list<node*>& t_ASTnodes) {
       std::list<node*>::iterator t_cursor = t_ASTnodes.begin();
       std::list<node*>::iterator t_further = t_ASTnodes.begin();
-      if (for_< tree::Call<AST::tree::line_name::global> >::organize(t_ASTnodes, t_cursor, t_further))
+      if (!for_< tree::Call<AST::tree::line_name::global> >::organize(t_ASTnodes, t_cursor, t_further))
 	std::cerr << "fail in grammar structuring" << std::endl;
     }
   };

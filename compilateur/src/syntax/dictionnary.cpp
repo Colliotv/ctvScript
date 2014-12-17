@@ -32,6 +32,9 @@ namespace ctvscript {
 	{syntax::identifier::public_statement,		{SOLID_REGEX("public")}},
 	{syntax::identifier::private_statement,		{SOLID_REGEX("private")}},
 
+	{syntax::identifier::new_statement,		{SOLID_REGEX("new")}},
+	{syntax::identifier::delete_statement,		{SOLID_REGEX("delete")}},
+
 	{syntax::identifier::semicolon,			{VARIABLE_REGEX(";+")}},
 	{syntax::identifier::Bparenthesis,		{VARIABLE_REGEX("\\(")}},
 	{syntax::identifier::Eparenthesis,		{VARIABLE_REGEX("\\)")}},
@@ -40,19 +43,37 @@ namespace ctvscript {
 	{syntax::identifier::Bsqbrackets,		{VARIABLE_REGEX("\\[")}},
 	{syntax::identifier::Esqbrackets,		{VARIABLE_REGEX("]")}},
 
-	{syntax::identifier::scope_resolution,		{VARIABLE_REGEX("::")}},
-	{syntax::identifier::increment,			{VARIABLE_REGEX("\\+\\+")}},
-	{syntax::identifier::decrement,			{VARIABLE_REGEX("--")}},
+	{syntax::identifier::scope_resolution,		{SOLID_REGEX("::")}},
+	{syntax::identifier::increment,			{SIZED_REGEX("\\+\\+", 2)}},
+	{syntax::identifier::decrement,			{SOLID_REGEX("--")}},
+
+	{syntax::identifier::binary_right_shift,	{SOLID_REGEX(">>")}},
+	{syntax::identifier::binary_left_shift,		{SOLID_REGEX("<<")}},
+
+	{syntax::identifier::and_symbol,		{SOLID_REGEX("&&")}},
+	{syntax::identifier::or_symbol,			{SIZED_REGEX("\\|\\|", 2)}},
+
+	{syntax::identifier::inferior_equal,		{SIZED_REGEX("<=", 2)}},
+	{syntax::identifier::superior_equal,		{SIZED_REGEX(">=", 2)}},
+	{syntax::identifier::equality,			{SIZED_REGEX("==", 2)}},
+
+	{syntax::identifier::comma,			{VARIABLE_REGEX("\\,")}},
 
 	{syntax::identifier::struct_dereference,	{VARIABLE_REGEX("\\.")}},
-	{syntax::identifier::struct_reference,		{VARIABLE_REGEX("->")}},
+	{syntax::identifier::struct_reference,		{SOLID_REGEX("->")}},
 
 	{syntax::identifier::colon,			{VARIABLE_REGEX(":")}},
+
+	{syntax::identifier::binary_and,		{SOLID_REGEX("&")}},
+	{syntax::identifier::binary_or,			{VARIABLE_REGEX("\\|")}},
+
 	{syntax::identifier::addition,			{VARIABLE_REGEX("\\+")}},
 	{syntax::identifier::substraction,		{VARIABLE_REGEX("-")}},
-	{syntax::identifier::division,			{VARIABLE_REGEX("/")}},
+	{syntax::identifier::division,			{VARIABLE_REGEX("\\/")}},
 	{syntax::identifier::multiplication,		{VARIABLE_REGEX("\\*")}},
 	{syntax::identifier::modulo,			{VARIABLE_REGEX("%")}},
+
+	{syntax::identifier::assignement,		{VARIABLE_REGEX("=")}},
 
 	{syntax::identifier::integer,			{VARIABLE_REGEX("([0-9])+(([a-z]|[A-Z])|[0-9])*")}},
 	{syntax::identifier::type_id,			{VARIABLE_REGEX("([a-z]|[A-Z])+(([a-z]|[A-Z])|[0-9])*")}},
@@ -61,20 +82,21 @@ namespace ctvscript {
     bool
     syntax::check_in_syntax(cursor& t_cursor, file_end t_end, const dictionnary_member& t_member) {
       if ((size_t)std::distance(t_cursor, t_end) < t_member.m_min_match_size)
-	return (false);
+	return ((false));
 
       cursor _advance = t_cursor;
       std::advance(_advance, t_member.m_min_match_size);
       for (;
 	   _advance != t_end && std::regex_match(std::string(t_cursor, _advance), t_member.m_match);
 	   ++_advance);
-
+      if ((_advance == t_end && std::regex_match(std::string(t_cursor, _advance), t_member.m_match)) &&
+	  std::distance(t_cursor, _advance) > 0) {
+	t_cursor = _advance;
+	return (true);
+      }
       if ((size_t)std::distance(t_cursor, _advance) != t_member.m_min_match_size
 	  && std::distance(t_cursor, _advance) > 0) {
-	if (_advance != t_end)
-	  t_cursor = --_advance;
-	else
-	  t_cursor = _advance;
+	t_cursor = --_advance;
 	return (true);
       }
       return (false);

@@ -56,7 +56,7 @@ namespace ctvscript {
       };
 
 
-      template<typename... nodes>
+      template<typename nodes, size_t...>
       struct Repeat{};
       template<typename... nodes>
       struct Or{};
@@ -86,6 +86,8 @@ namespace ctvscript {
     struct for_< tree::Compare<ASTnode> >;
     template<AST::tree::line_name line>
     struct for_< tree::Call<line> >;
+
+    void launch_grammar(std::list<node*>&);
   };
 };
 

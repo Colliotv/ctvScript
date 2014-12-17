@@ -3,10 +3,39 @@
 # ifndef  INCLUDED_FROM_ASTGRAMMAR
 #  error "This file should be included only in ASTgrammar.h"
 # endif
+# define INCLUDED_FROM_GRAMMAR_LINE
+
+class FunctionDefinitionLine
+  : public GrammarLine
+< line_name::global, //change to function_definition after testing
+  And<
+    And<
+      Compare<AST::keyword::Fun>,
+      Compare<AST::values::Unspecified_typeid>, //need a type line
+      Compare<AST::values::Unspecified_typeid>,
+      Compare<AST::symbol::Bparenthesis>
+      >,
+    Repeat<
+      And<
+	Compare<AST::values::Unspecified_typeid>,
+	Compare<AST::values::Unspecified_typeid>,
+	Compare<AST::symbol::Comma>
+	>
+      , 0
+      >,
+    Repeat<
+      And<
+	Compare<AST::values::Unspecified_typeid>,
+	Compare<AST::values::Unspecified_typeid>
+	>
+      , 0, 1
+      >,
+    Compare<AST::symbol::Eparenthesis>
+    >
+  > {};
 
 
+typedef GrammarTree< FunctionDefinitionLine > Grammar; 
 
-typedef GrammarTree<GrammarLine<line_name::global, And<Call<line_name::global> > > > Grammar; 
-
-
+# undef INCLUDED_FROM_GRAMMAR_LINE
 #endif

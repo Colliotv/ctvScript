@@ -5,8 +5,9 @@
 # include <map>
 # include <list>
 
-# define VARIABLE_REGEX(__string__)	std::regex(__string__, std::regex::optimize), 1
-# define  SOLID_REGEX(__string__)	std::regex(__string__, std::regex::optimize), sizeof(__string__) - 1
+# define SIZED_REGEX(__string__, size) 	std::regex(__string__, std::regex::optimize), size
+# define  VARIABLE_REGEX(__string__)	std::regex(__string__, std::regex::optimize), 1
+# define   SOLID_REGEX(__string__)	std::regex(__string__, std::regex::optimize), sizeof(__string__) - 1
 
 namespace ctvscript {
   namespace parser{
@@ -32,6 +33,8 @@ namespace ctvscript {
 	  , class_statement
 	  , public_statement
 	  , private_statement
+
+	  , comma
 
 	  , semicolon
 	  , Bparenthesis, Eparenthesis
