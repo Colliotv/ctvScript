@@ -11,8 +11,8 @@ namespace ctvscript {
       static void void_(...) {}
 
       static void list_modifier(std::list<AST::node*>& t_list,
-				std::list<AST::node*>::iterator t_fcut,
-				std::list<AST::node*>::iterator t_ecut,
+				std::list<AST::node*>::iterator& t_fcut,
+				std::list<AST::node*>::iterator& t_ecut,
 				std::function<std::list<AST::node*>(std::list<AST::node*>)> t_cut_call) {
 	if (t_fcut == t_ecut) {
 	  (void)t_cut_call(std::list<AST::node*>());
@@ -21,14 +21,29 @@ namespace ctvscript {
 	auto _fcut = t_fcut;
 	auto _ecut = t_ecut;
 
-	std::advance(_fcut, 1);
-	if (_ecut != t_list.end())
-	  std::advance(_ecut, 1);
+	std::advance(_fcut, -1);
+
+	std::cout << "cutted list: ";
+	for (auto member : std::list<AST::node*>(t_fcut, t_ecut))
+	  std::cout << member->get_syntax() << " ";
+	std::cout << std::endl;
 
 	auto _list = t_cut_call(std::list<AST::node*>(t_fcut, t_ecut));
-	t_list.erase(_fcut, _ecut);
-	std::advance(t_fcut, 1);
-	t_list.insert(t_fcut, _list.cbegin(), _list.cend());
+	t_list.erase(t_fcut, t_ecut);
+	std::advance(t_fcut, 0);
+
+	std::cout << "before insertion list: ";
+	for (auto member : t_list)
+	  std::cout << member->get_syntax() << " ";
+	std::cout << std::endl;
+
+	std::advance(_fcut, 1);
+	t_list.insert(_fcut, _list.cbegin(), _list.cend());
+
+	std::cout << "final list: ";
+	for (auto member : t_list)
+	  std::cout << member->get_syntax() << " ";
+	std::cout << std::endl;
       }
 
     };
@@ -38,7 +53,6 @@ namespace ctvscript {
     struct for_< tree::Repeat<tree_node> > {
       static bool organize(std::list<node*>& t_ASTnodes, std::list<AST::node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	bool retval = false;
 	std::list<node*>::iterator save = t_cursor;
 
@@ -55,7 +69,6 @@ namespace ctvscript {
     struct for_< tree::Repeat<tree_node, it_min> > {
       static bool organize(std::list<node*>& t_ASTnodes, std::list<AST::node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	bool retval = false;
 	size_t it = 0;
 	std::list<node*>::iterator save = t_cursor;
@@ -76,7 +89,6 @@ namespace ctvscript {
     struct for_< tree::Repeat<tree_node, it_min, it_max> > {
       static bool organize(std::list<node*>& t_ASTnodes, std::list<AST::node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	bool retval = false;
 	size_t it = 0;
 	std::list<node*>::iterator save = t_cursor;
@@ -114,7 +126,6 @@ namespace ctvscript {
     public:
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	std::list<node*>::iterator save = t_cursor;
 	bool retval = _or<nodes...>::calc(t_ASTnodes, t_cursor, t_further);
 	if (!retval)
@@ -136,14 +147,11 @@ namespace ctvscript {
 		       std::list<AST::node*>::iterator& t_further) {
 	if (for_<node_head>::organize(t_ASTnodes, t_cursor, t_further)) {
 	  if (!_and<node_tail...>::calc(t_ASTnodes, t_cursor, t_further)) {
-	    std::cerr << "depile false" << std::endl;
 	    return false;
 	  } else {
-	    std::cerr << "depile true" << std::endl;
 	    return true;
 	  }
 	}
-	std::cerr << "return false" << std::endl << std::endl;
 	return (false);
       }
     };
@@ -153,15 +161,9 @@ namespace ctvscript {
     public:
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
-	std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	bool retval;
 	std::list<node*>::iterator save = t_cursor;
 	retval = _and<nodes...>::calc(t_ASTnodes, t_cursor, t_further);
-
-	if (!retval)
-	  std::cerr << "error in {"<< __PRETTY_FUNCTION__ << "}" << std::endl << std::endl;
-	else
-	  std::cerr << "clear in {"<< __PRETTY_FUNCTION__ << "}" << std::endl << std::endl;
 
 	if (!retval)
 	  t_cursor = save;
@@ -200,10 +202,6 @@ namespace ctvscript {
 	  if (std::distance(t_further, t_cursor) > 0)
 	    t_further = t_cursor;
 	}
-	if (!retval)
-	  std::cerr << "error in {"<< __PRETTY_FUNCTION__ << "}" << std::endl << std::endl;
-	else
-	  std::cerr << "clear in {"<< __PRETTY_FUNCTION__ << "}" << std::endl << std::endl;
 
 	return (retval);
       }

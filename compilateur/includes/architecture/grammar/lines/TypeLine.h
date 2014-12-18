@@ -21,12 +21,15 @@ class TypeDefinitionLine
 	,0,1>,
       Call<line_name::ScopedId>,
       Repeat<
-	And<
-	  Match<AST::symbol::Bsqbracket>,
-	  Match<AST::values::Integer>,
-	  Match<AST::symbol::Esqbracket>
+	Or<
+	  And<
+	    Match<AST::symbol::Bsqbracket>,
+	    Match<AST::values::Integer>,
+	    Match<AST::symbol::Esqbracket>
+	    >,
+	  Call<line_name::argument_list>
 	  >
-	, 0, 1>
+	, 0>
       >,
     Match<AST::final::Type>
     >

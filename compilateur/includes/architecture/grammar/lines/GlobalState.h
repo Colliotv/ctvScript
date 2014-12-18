@@ -11,7 +11,7 @@ class GlobalState
     Or<
       Call<line_name::function_definition>
       >
-    ,0>
+    ,1>
   >{};
 
 #endif

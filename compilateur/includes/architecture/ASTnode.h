@@ -31,11 +31,12 @@ namespace ctvscript {
       node(const std::string&, const node::syntax&);
 
     public:
-      virtual node::syntax get_syntax() { return m_syntax; }
+      virtual const node::syntax get_file_syntax() { return m_syntax; }
+      virtual const std::string  get_syntax() { return m_string_syntax; }
 
     private:
-      const std::string&	m_file_line;
-      const node::syntax&	m_syntax;
+      const std::string		m_string_syntax;
+      const node::syntax	m_syntax;
     };
 
     /*
@@ -186,7 +187,6 @@ namespace ctvscript {
       keyword::Fun,							\
       keyword::If, keyword::Else,					\
       keyword::Return,							\
-      keyword::Typedef,							\
       keyword::Import,							\
       keyword::Namespace,						\
       keyword::Class, keyword::Public, keyword::Private,		\
@@ -209,6 +209,7 @@ namespace ctvscript {
       operands::Equality,						\
       operands::ScopeResolution,					\
       values::Unspecified_typeid,					\
+      values::Const, values::Static,					\
       values::String, values::Char,					\
       values::Floating, values::Integer
 

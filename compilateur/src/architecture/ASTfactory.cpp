@@ -8,8 +8,8 @@ namespace ctvscript {
       : m_file_line(t_file_line), m_column(t_column), m_line(t_line) {}
 
     /* ## Node:: Ctor ## */
-    node::node(const std::string& t_file_line, const node::syntax& t_syntax)
-      : m_file_line(t_file_line), m_syntax(t_syntax) {}
+    node::node(const std::string& t_string_syntax, const node::syntax& t_syntax)
+      : m_string_syntax(t_string_syntax), m_syntax(t_syntax) {}
 
     /* ## Factory:: syntax_map ## */
     template<typename __node>
