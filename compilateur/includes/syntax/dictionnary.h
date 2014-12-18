@@ -44,6 +44,10 @@ namespace ctvscript {
 	  , new_statement
 	  , delete_statement
 
+	  , static_statement
+	  , const_statement
+	  , reference
+
 	  , scope_resolution
 
 	  , binary_left_shift
@@ -70,11 +74,12 @@ namespace ctvscript {
 	  , inferior
 	  , superior
 
+	  , star
+
 	  , addition
 	  , substraction
 	  , division
 	  , modulo
-	  , multiplication
 
 	  , assignement
 

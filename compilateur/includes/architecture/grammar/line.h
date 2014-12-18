@@ -5,7 +5,8 @@
 # endif
 
 enum class line_name{
-  global, function_definition
+  global,
+    function_definition, type_definition, argument_list, variable_definition, ScopedId
 };
 
 #endif

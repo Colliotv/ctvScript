@@ -27,6 +27,9 @@ namespace ctvscript {
 
 	{syntax::identifier::import_statement,		{SOLID_REGEX("import")}},
 
+	{syntax::identifier::const_statement,		{SOLID_REGEX("const")}},
+	{syntax::identifier::static_statement,		{SOLID_REGEX("static")}},
+
 	{syntax::identifier::namespace_statement,	{SOLID_REGEX("namespace")}},
 	{syntax::identifier::class_statement,		{SOLID_REGEX("class")}},
 	{syntax::identifier::public_statement,		{SOLID_REGEX("public")}},
@@ -67,10 +70,11 @@ namespace ctvscript {
 	{syntax::identifier::binary_and,		{SOLID_REGEX("&")}},
 	{syntax::identifier::binary_or,			{VARIABLE_REGEX("\\|")}},
 
+	{syntax::identifier::star,			{VARIABLE_REGEX("\\*")}},
+
 	{syntax::identifier::addition,			{VARIABLE_REGEX("\\+")}},
 	{syntax::identifier::substraction,		{VARIABLE_REGEX("-")}},
 	{syntax::identifier::division,			{VARIABLE_REGEX("\\/")}},
-	{syntax::identifier::multiplication,		{VARIABLE_REGEX("\\*")}},
 	{syntax::identifier::modulo,			{VARIABLE_REGEX("%")}},
 
 	{syntax::identifier::assignement,		{VARIABLE_REGEX("=")}},

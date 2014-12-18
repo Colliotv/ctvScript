@@ -5,37 +5,23 @@
 # endif
 # define INCLUDED_FROM_GRAMMAR_LINE
 
-class FunctionDefinitionLine
-  : public GrammarLine
-< line_name::global, //change to function_definition after testing
-  And<
-    And<
-      Compare<AST::keyword::Fun>,
-      Compare<AST::values::Unspecified_typeid>, //need a type line
-      Compare<AST::values::Unspecified_typeid>,
-      Compare<AST::symbol::Bparenthesis>
-      >,
-    Repeat<
-      And<
-	Compare<AST::values::Unspecified_typeid>,
-	Compare<AST::values::Unspecified_typeid>,
-	Compare<AST::symbol::Comma>
-	>
-      , 0
-      >,
-    Repeat<
-      And<
-	Compare<AST::values::Unspecified_typeid>,
-	Compare<AST::values::Unspecified_typeid>
-	>
-      , 0, 1
-      >,
-    Compare<AST::symbol::Eparenthesis>
-    >
-  > {};
 
+# include "lines/GlobalState.h"
+class GlobalState;
 
-typedef GrammarTree< FunctionDefinitionLine > Grammar; 
+# include "lines/FunctionLine.h"
+class FunctionDefinitionLine;
+
+# include "lines/ArgumentListLine.h" // != CallerParameterList
+class ArgumentListLine;
+
+# include "lines/TypeLine.h"
+class TypeDefinitionLine;
+
+# include "lines/ScopedId.h"
+class ScopedIdLine;
+
+typedef GrammarTree< GlobalState, FunctionDefinitionLine, TypeDefinitionLine, ArgumentListLine, ScopedIdLine > Grammar; 
 
 # undef INCLUDED_FROM_GRAMMAR_LINE
 #endif

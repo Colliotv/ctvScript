@@ -64,7 +64,7 @@ namespace ctvscript {
       struct And{};
 
       template<typename ASTnode>
-      struct Compare{};
+      struct Match{};
       template<AST::tree::line_name line>
       struct Call{};
 
@@ -83,7 +83,7 @@ namespace ctvscript {
     struct for_< tree::And<nodes...> >;
 
     template<typename ASTnode>
-    struct for_< tree::Compare<ASTnode> >;
+    struct for_< tree::Match<ASTnode> >;
     template<AST::tree::line_name line>
     struct for_< tree::Call<line> >;
 

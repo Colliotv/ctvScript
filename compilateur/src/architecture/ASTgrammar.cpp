@@ -190,7 +190,7 @@ namespace ctvscript {
 
     /* ############ COMPARE ############ */
     template<typename ASTnode>
-    struct for_< tree::Compare<ASTnode> > {
+    struct for_< tree::Match<ASTnode> > {
       static bool organize(std::list<node*>&, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
 	bool retval = false;
@@ -215,7 +215,9 @@ namespace ctvscript {
       std::list<node*>::iterator t_cursor = t_ASTnodes.begin();
       std::list<node*>::iterator t_further = t_ASTnodes.begin();
       if (!for_< tree::Call<AST::tree::line_name::global> >::organize(t_ASTnodes, t_cursor, t_further))
-	std::cerr << "fail in grammar structuring" << std::endl;
+	std::cerr << std::endl << std::endl << std::endl << "fail in grammar structuring!!!!!!" << std::endl;
+      else
+	std::cerr << std::endl << std::endl << std::endl << "success in grammar structuring!!!!!!" << std::endl;
     }
   };
 };
