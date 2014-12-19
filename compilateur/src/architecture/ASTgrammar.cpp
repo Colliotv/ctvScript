@@ -19,7 +19,6 @@ namespace ctvscript {
 	  return ;
 	}
 	auto _fcut = t_fcut;
-	auto _ecut = t_ecut;
 
 	std::advance(_fcut, -1);
 

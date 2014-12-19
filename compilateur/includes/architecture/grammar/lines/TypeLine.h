@@ -12,7 +12,39 @@ class TypeDefinitionLine
       Repeat<
 	Or<
 	  Match<AST::values::Const>,
-	  Match<AST::values::Static>,
+	  Match<AST::symbol::Star>
+	  >
+	,0 >,
+      Match<AST::symbol::Bparenthesis>,
+      Call<line_name::type_definition>,
+      Match<AST::symbol::Eparenthesis>,
+      Repeat<
+	Or<
+	  And<
+	    Match<AST::symbol::Bsqbracket>,
+	    Match<AST::values::Integer>,
+	    Match<AST::symbol::Esqbracket>
+	    >,
+	  And<
+	    Match<AST::symbol::Bparenthesis>,
+	    Repeat<
+	      And<
+		Call<line_name::type_definition>,
+		Match<AST::symbol::Comma>
+		>
+	      ,0>,
+	    Repeat<
+	      Call<line_name::type_definition>
+	      ,0,1>,
+	    Match<AST::symbol::Eparenthesis>
+	    >
+	  >
+	, 0>
+      >,
+    And<
+      Repeat<
+	Or<
+	  Match<AST::values::Const>,
 	  Match<AST::symbol::Star>
 	  >
 	,0 >,
@@ -27,7 +59,19 @@ class TypeDefinitionLine
 	    Match<AST::values::Integer>,
 	    Match<AST::symbol::Esqbracket>
 	    >,
-	  Call<line_name::argument_list>
+	  And<
+	    Match<AST::symbol::Bparenthesis>,
+	    Repeat<
+	      And<
+		Call<line_name::type_definition>,
+		Match<AST::symbol::Comma>
+		>
+	      ,0>,
+	    Repeat<
+	      Call<line_name::type_definition>
+	      ,0,1>,
+	    Match<AST::symbol::Eparenthesis>
+	    >
 	  >
 	, 0>
       >,
