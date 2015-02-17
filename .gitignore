@@ -39,39 +39,3 @@
 #unignore readme (just in case)
 !readme*
 !README*
-
-
-char**	split_c(String* this, char separator) {char** tab;
-  int	sep_counter(const char* s) {
-    return ((s && *s)
-	    ?((*s == separator ? (1) : (0)) + sep_counter(s+1))
-	    :(0));
-  }
-  void	tab_filler(char** _tab, const char* s) {
-    int		next_counter(const char* _s) {
-      return (_s && *_s && *_s != separator
-	      ? (1 + next_counter(_s+1))
-	      : (0));
-    }
-    void	char_filler(char* fill, const char* _s) {
-      return ((void) (_s && *_s && *_s != separator
-		      ? ((*fill = *_s, char_filler(fill+1,s+1)), 0)
-		      : (*fill = 0))
-	      );
-    }
-    return ((void) (s && *s
-		    ? (
-		       ( *_tab = malloc(sizeof(char) * next_counter(s)) ),
-		       ( char_filler(*_tab, s) ),
-		       ( tab_filler(_tab+1, s+next_counter(s)) ),
-		       NULL
-		       )
-		    : (*tab = NULL)
-		    )
-	    );
-  }
-  return (tab = malloc(sizeof(char*) * (sep_counter(this->str) + 1)),	  
-	  tab_filler(tab, this->str),
-	  tab
-	  );
-}

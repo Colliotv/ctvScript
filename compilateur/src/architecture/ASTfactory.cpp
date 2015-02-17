@@ -22,7 +22,7 @@ namespace ctvscript {
 	make_ASTallocator() {
       std::map< parser::syntax::identifier, std::function<AST::node*(const std::string&, const node::syntax&)> > retval({
 	  {parser::syntax::identifier(__nodes::syntax_identifier),  make_node<__nodes>}...
-	});
+	    });
       return retval;
     }
 
