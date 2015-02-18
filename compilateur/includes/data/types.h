@@ -4,8 +4,6 @@
 # include <map>
 # include <cstdlib>
 
-# include <thread>
-# include <mutex>
 /*
  * [ctv todo]
  *   no definition in .h
@@ -13,47 +11,37 @@
 namespace ctvscript {
   namespace byte_code {
     namespace data {
-      class types {
-      public:
-	class base_type{
+      namespace type {
+
+	namespace container {
+	  class interface;
+	};
+
+	class interface {
+	public:
+	  virtual type::interface*		deep_copy() const = 0;
+	};
+
+	template<bool m_is_floating, bool m_is_signed, unsigned char m_type_size>
+	class primary : public interface {
+	public:
+
+	public:
+	  virtual type::interface*		deep_copy() const {
+	    return (new primary<m_is_floating, m_is_signed, m_type_size>());
+	  }
+	};
+
+	class structure : public interface {
 	private:
-	  std::string		name;
+	  std::map<std::string, container::interface>	m_private_members;
+	  std::map<std::string, container::interface>	m_public_members;
 
 	public:
-	  base_type(const std::string&);
+	  structure(std::map<std::string, container::interface>&&, std::map<std::string, container::interface>&&);
+	  structure();
 	};
-
-	class struct_type : public base_type{
-	private:
-	  std::map<std::string /* member*/, std::size_t> m_members;
-
-	public:
-	  struct_type(const std::string&);
-	};
-
-	class unknown_type : public base_type{
-	public:
-	  unknown_type(const std::string&);
-	};
-
-      private:
-	static std::mutex			m_lock;
-	static const std::vector<base_type*>	m_base_types;
-	static const std::vector<struct_type*>	m_struct_types;
-
-      public:
-	enum class status_t {
-	  NO_ERROR,
-	    ALREADY_EXIST, 
-	    NOT_A_STRUCT,
-	    DONT_EXIST};
-	static types::status_t	addType();
-	static types::status_t	addStruct();
-
-      public:
-	static bool		does_type_exist(const std::string& t_type);
-	static types::status_t	can_access(const base_type*,
-					   const std::string& t_member);
+	
       };
     };
   };

@@ -16,6 +16,20 @@ class FunctionDefinitionLine
       >,
     Match<AST::final::Function>
     >
-  > {};
+  > {
+public:
+  static std::list<AST::node*> onError(std::list<AST::node*> t_list) {
+    std::cout
+      << "function definition, error"
+      << std::endl;
+    return (t_list);
+  }
+  static std::list<AST::node*> onMatch(std::list<AST::node*> t_list) {
+    std::cout
+      << "function definition, match"
+      << std::endl;
+    return (t_list);
+  }
+};
 
 #endif

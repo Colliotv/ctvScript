@@ -19,6 +19,10 @@ class ScopedIdLine
       >,
     Match<AST::final::ScopedId>
     >
-  > {};
+  > {
+public:
+  static std::list<AST::node*> onError(std::list<AST::node*> t_list);
+  static std::list<AST::node*> onMatch(std::list<AST::node*> t_list);
+};
 
 #endif

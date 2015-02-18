@@ -1,10 +1,11 @@
 #include <iostream>
 #include "architecture/ASTgrammar.h"
 
+#include "data/derived_types.h"
+
 
 namespace ctvscript {
   namespace AST {
-    namespace tree{};
     namespace utils{
 
       template<bool... retvals>
@@ -161,6 +162,7 @@ namespace ctvscript {
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
 	bool retval;
+
 	std::list<node*>::iterator save = t_cursor;
 	retval = _and<nodes...>::calc(t_ASTnodes, t_cursor, t_further);
 
@@ -192,9 +194,14 @@ namespace ctvscript {
     /* ############ COMPARE ############ */
     template<typename ASTnode>
     struct for_< tree::Match<ASTnode> > {
-      static bool organize(std::list<node*>&, std::list<node*>::iterator& t_cursor,
+      static bool organize(std::list<node*>& t_ASTNodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
 	bool retval = false;
+
+	if (t_cursor == t_ASTNodes.end()) {
+	  return false;
+	}
+
 	if (dynamic_cast<ASTnode*>(*t_cursor) != nullptr) {
 	  retval = true;
 	  ++t_cursor;
@@ -206,7 +213,9 @@ namespace ctvscript {
       }
     };
 
-    # include "architecture/grammar/lines/index.hpp"
+    namespace tree {
+	# include "architecture/grammar/lines/index.hpp"
+    };
 
     void launch_grammar(std::list<node*>& t_ASTnodes) {
       std::list<node*>::iterator t_cursor = t_ASTnodes.begin();

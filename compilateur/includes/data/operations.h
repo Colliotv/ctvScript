@@ -7,12 +7,13 @@ namespace ctvscript {
       class operations {
       public:
 	enum class operators{
-	  default_,
+	  error_,
 	    addition, substraction,
 	    multiplication,
 	    division, modulo,
 	    call,
-	    cast
+	    upcast,
+	    downcast,
 	};
 
       public:

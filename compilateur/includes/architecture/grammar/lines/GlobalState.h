@@ -9,9 +9,9 @@ class GlobalState
 < line_name::global,
   Repeat<
     Or<
-      Call<line_name::function_definition>
+      And< Call<line_name::function_definition>, Match<AST::symbol::Semicolon> >
       >
-    ,1>
+    , 1>
   >{};
 
 #endif

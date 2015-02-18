@@ -13,20 +13,38 @@ class ArgumentListLine
       Repeat<
 	And<
 	  Call<line_name::type_definition>,
-	  Call<line_name::ScopedId>,
+	  Repeat<
+	    Match<AST::values::Unspecified_typeid>
+	    ,0,1>,
 	  Match<AST::symbol::Comma>
 	  >
 	,0>,
       Repeat<
 	And<
 	  Call<line_name::type_definition>,
-	  Call<line_name::ScopedId>
+	  Repeat<
+	    Match<AST::values::Unspecified_typeid>
+	    ,0,1>
 	  >
 	,0,1>,
       Match<AST::symbol::Eparenthesis>
       >,
     Match<AST::final::ArgumentsList>
     >
-  >{}; 
+  > {
+public:
+  static std::list<AST::node*> onError(std::list<AST::node*> t_list) {
+    std::cout
+      << "argument list line, error"
+      << std::endl;
+    return (t_list);
+  }
+  static std::list<AST::node*> onMatch(std::list<AST::node*> t_list) {
+    std::cout
+      << "argument list line, match"
+      << std::endl;
+    return (t_list);
+  }
+};
 
 #endif

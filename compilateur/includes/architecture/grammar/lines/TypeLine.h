@@ -10,14 +10,8 @@ class TypeDefinitionLine
   Or<
     And<
       Repeat<
-	Or<
-	  Match<AST::values::Const>,
-	  Match<AST::symbol::Star>
-	  >
-	,0 >,
-      Repeat<
-        Match<AST::symbol::Reference>
-	,0,1>,
+	Match<AST::values::Const>
+	, 0, 1>,
       Or<
         And<
           Match<AST::symbol::Bparenthesis>,
@@ -26,6 +20,12 @@ class TypeDefinitionLine
          >,
         Call<line_name::ScopedId>
 	>,
+      Repeat<
+	Match<AST::symbol::Star>
+	, 0>,
+      Repeat<
+        Match<AST::symbol::Reference>
+	, 0, 1>,
       Repeat<
 	Or<
 	  And<
@@ -47,10 +47,14 @@ class TypeDefinitionLine
 	    Match<AST::symbol::Eparenthesis>
 	    >
 	  >
-	, 0>
+      , 0>
       >,
-    Match<AST::final::Type>
+  Match<AST::final::Type>
     >
-  > {};
+  > {
+public:
+  static std::list<AST::node*> onError(std::list<AST::node*> t_list);
+  static std::list<AST::node*> onMatch(std::list<AST::node*> t_list);
+};
 
 #endif

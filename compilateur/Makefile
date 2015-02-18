@@ -9,17 +9,24 @@ INC	= -I ./includes
 ########################
 #### MAIN
 MAIN	= src/launch/main.cpp
+
 #### ARCHI
 ARCHI	= src/architecture/ASTfactory.cpp \
 	src/architecture/ASTgrammar.cpp
+
 ### syntax
 SYNTAX	= src/syntax/ASTparser.cpp\
 	src/syntax/utils.cpp\
 	src/syntax/dictionnary.cpp
+
 ### UTILS
 UTILS	= src/utils/exception.cpp
+
+### DATA
+DATA	= src/data/derived_types.cpp
+
 ########################
-SRC	=  $(MAIN) $(SYNTAX) $(ARCHI) $(UTILS)
+SRC	=  $(MAIN) $(SYNTAX) $(ARCHI) $(UTILS) $(DATA)
 
 FLAGS	= -W -Wall -Wextra $(INC) -std=c++11 -g3
 
