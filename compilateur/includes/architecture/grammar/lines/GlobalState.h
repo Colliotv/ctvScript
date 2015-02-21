@@ -9,7 +9,7 @@ class GlobalState
 < line_name::global,
   Repeat<
     Or<
-      And< Call<line_name::function_definition>, Match<AST::symbol::Semicolon> >
+      Call<line_name::function_forward_declaration>
       >
     , 1>
   >{};

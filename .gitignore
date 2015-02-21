@@ -18,21 +18,6 @@
 !*.h
 !Makefile
 
-#unignore gdl_libs
-!*.a
-!*.so
-!libfbxsdk.a
-!libfbxsdk.so
-!libgdl_gl.a
-!libGLEW.a
-!libSDL2.a
-!libSDL2main.a
-
-#unignore 3d and texture
-!*.tga
-!*.FBX
-!*.max
-
 #unignore auteur
 !auteur
 

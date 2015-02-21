@@ -172,8 +172,14 @@ namespace ctvscript {
       #include "nodes/scoped_id.h"
       class ScopedId;
 
-      #include "nodes/function_definition.h"
-      class Function;
+      #include "nodes/scoped_type.h"
+      class ScopedType;
+
+      #include "nodes/function_prototype.h"
+      class FunctionPrototype;
+
+      #include "nodes/function_forward_declaration.h"
+      class FunctionForwardDeclaration;
 
       #include "nodes/type_definition.h"
       class Type;

@@ -6,7 +6,8 @@
 
 enum class line_name{
   global,
-    function_definition, type_definition, argument_list, variable_definition, ScopedId
+    function_forward_declaration,
+    function_prototype, type_definition, argument_list, variable_definition, scoped_id, scoped_type
 };
 
 #endif

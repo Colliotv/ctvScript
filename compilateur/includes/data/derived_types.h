@@ -80,22 +80,35 @@ namespace ctvscript {
 	  bool			exist	(const std::string&) const;
 	  const wrapper*	at	(const std::string&) const;
 
+	private:
+	  const wrapper*	m_up;
+
+	public:
+	  void			setUp(const wrapper*);
+	  const wrapper*	getUp() const;
+
 	public:
 	  /* type */
 	  wrapper(container::interface* t_type)
-	    : m_type(t_type), m_is_scope(false), m_table() {}
+	    : m_type(t_type), m_is_scope(false), m_table(), m_up(NULL) {}
 	
 	  /* class */
 	  wrapper(container::interface* t_type, type::map&& t_table)
-	    : m_type(t_type), m_is_scope(true), m_table(t_table) {}
+	    : m_type(t_type), m_is_scope(true), m_table(t_table), m_up(NULL) {
+	    for (type::map::value_type& t : m_table)
+	      t.second.setUp(this);
+	  }
 
 	  /* namespace */
 	  wrapper(type::map&& t_table)
-	    : m_type(NULL), m_is_scope(true), m_table(std::move(t_table)) {}
+	    : m_type(NULL), m_is_scope(true), m_table(std::move(t_table)), m_up(NULL) {
+	    for (type::map::value_type& t : m_table)
+	      t.second.setUp(this);
+	  }
 	};
 
 	extern wrapper					table;
-	extern const wrapper*				current_context;
+	extern wrapper*					current_context;
       };
     };
   };

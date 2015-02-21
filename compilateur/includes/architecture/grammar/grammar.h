@@ -9,19 +9,25 @@
 # include "lines/GlobalState.h"
 class GlobalState;
 
-# include "lines/FunctionLine.h"
-class FunctionDefinitionLine;
+# include "lines/FunctionPrototype.h"
+class FunctionPrototype;
+
+# include "lines/FunctionForwardDeclaration.h"
+class FunctionForwardDeclaration;
 
 # include "lines/ArgumentListLine.h" // != CallerParameterList
 class ArgumentListLine;
 
-# include "lines/TypeLine.h"
-class TypeDefinitionLine;
+# include "lines/Type.h"
+class TypeDefinition;
 
 # include "lines/ScopedId.h"
-class ScopedIdLine;
+class ScopedId;
 
-typedef GrammarTree< GlobalState, FunctionDefinitionLine, TypeDefinitionLine, ArgumentListLine, ScopedIdLine > Grammar; 
+# include "lines/ScopedType.h"
+class ScopedType;
+
+using Grammar = GrammarTree< GlobalState, FunctionForwardDeclaration, FunctionPrototype, TypeDefinition, ArgumentListLine, ScopedId, ScopedType >; 
 
 # undef INCLUDED_FROM_GRAMMAR_LINE
 #endif

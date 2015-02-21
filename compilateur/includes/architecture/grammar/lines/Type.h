@@ -4,7 +4,7 @@
 #  error "This file should be included only in ASTgrammar.h"
 # endif
 
-class TypeDefinitionLine
+class TypeDefinition
   : public GrammarLine
 < line_name::type_definition,
   Or<
@@ -18,7 +18,9 @@ class TypeDefinitionLine
           Call<line_name::type_definition>,
           Match<AST::symbol::Eparenthesis>
          >,
-        Call<line_name::ScopedId>
+	Or<
+	  Call<line_name::scoped_type>
+	  >
 	>,
       Repeat<
 	Match<AST::symbol::Star>

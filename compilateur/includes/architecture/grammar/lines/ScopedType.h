@@ -1,12 +1,12 @@
-#ifndef IdLine_h__
-# define IdLine_h__
+#ifndef ScopedType_h__
+# define ScopedType_h__
 # ifndef  INCLUDED_FROM_GRAMMAR_LINE
 #  error "This file should be included only in ASTgrammar.h"
 # endif
 
-class ScopedId
+class ScopedType
   : public GrammarLine
-< line_name::scoped_id,
+< line_name::scoped_type,
   Or<
     And<
       Repeat<
@@ -17,7 +17,7 @@ class ScopedId
 	,0 >,
       Match<AST::values::Unspecified_typeid>
       >,
-    Match<AST::final::ScopedId>
+    Match<AST::final::ScopedType>
     >
   > {
 public:

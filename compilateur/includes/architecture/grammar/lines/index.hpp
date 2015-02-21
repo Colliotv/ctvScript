@@ -1,2 +1,3 @@
-#include "architecture/grammar/lines/TypeLine.hpp"
-#include "architecture/grammar/lines/ScopedId.hpp"
+#include "Type.hpp"
+#include "ScopedId.hpp"
+#include "ScopedType.hpp"

@@ -1,4 +1,0 @@
-var int oui;
-var void non;
-oui + non + non + oui + new non;
-non;
