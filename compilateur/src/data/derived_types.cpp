@@ -18,9 +18,19 @@ namespace ctvscript {
 	  return (&m_table.at(t_key));
 	};
 
+	wrapper*	wrapper::at(const std::string& t_key) {
+	  if (!exist(t_key))
+	    return NULL; // (later throw)
+	  return (&m_table.at(t_key));
+	};
+
 	
-	void		wrapper::setUp(const wrapper* t_up)	{ m_up = t_up; }
-	const wrapper*	wrapper::getUp() const			{ return (m_up); }
+	void		wrapper::setUp(wrapper* t_up)	{ m_up = t_up; }
+	wrapper*	wrapper::getUp()		{ return (m_up); }
+
+	bool		wrapper::is_scope() const	{ return m_is_scope; }
+
+	container::interface*	wrapper::get_type()	{ return m_type; }
 
 	/*
 	 * Table Definitions
@@ -29,10 +39,8 @@ namespace ctvscript {
 	      {"int",		{new container::underived(new primary<false, true, 4>())} },
 	      {"signed int",	{new container::underived(new primary<false, true, 4>())} },
 	      {"unsigned int",	{new container::underived(new primary<false, false, 4>())} },
-	      {"double",		{new container::underived(new primary<true, true, 8>())} },
-	      { "std", type::map({
-		    {"size_t",		{new container::underived(new primary<false, false, 8>())} },
-		      }) },
+	      {"double",	{new container::underived(new primary<true, true, 8>())} },
+	      {"string",	{new container::underived(new string())} },
 	      }));
 
 	/*

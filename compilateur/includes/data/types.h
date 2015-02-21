@@ -32,6 +32,16 @@ namespace ctvscript {
 	  }
 	};
 
+	class string : public interface {
+	public:
+
+
+	public:
+	  virtual type::interface*		deep_copy() const {
+	    return (new string());
+	  }
+	};
+
 	class structure : public interface {
 	private:
 	  std::map<std::string, container::interface>	m_private_members;

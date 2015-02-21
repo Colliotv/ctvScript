@@ -1,1 +1,1 @@
-def int toto(int, char);
+def const(const int()) ouioui(int toto, int non);

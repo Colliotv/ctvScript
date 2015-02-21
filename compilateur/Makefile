@@ -8,25 +8,34 @@ SRC	=
 INC	= -I ./includes
 ########################
 #### MAIN
-MAIN	= src/launch/main.cpp
+MAIN		= src/launch/main.cpp
 
 #### ARCHI
-ARCHI	= src/architecture/ASTfactory.cpp \
-	src/architecture/ASTgrammar.cpp
+ARCHI_LINE	= \
+		src/architecture/line/ScopedId.cpp \
+		src/architecture/line/ScopedType.cpp \
+		src/architecture/line/TypeDefinition.cpp
 
+ARCHI_NODE	= \
+		src/architecture/node/type_definition.cpp
+
+
+ARCHI		= src/architecture/ASTfactory.cpp \
+		src/architecture/ASTlaunch.cpp \
+		$(ARCHI_LINE) $(ARCHI_NODE)
 ### syntax
-SYNTAX	= src/syntax/ASTparser.cpp\
-	src/syntax/utils.cpp\
-	src/syntax/dictionnary.cpp
+SYNTAX		= src/syntax/ASTparser.cpp\
+		src/syntax/utils.cpp\
+		src/syntax/dictionnary.cpp
 
-### UTILS
-UTILS	= src/utils/exception.cpp
+### EXCEPTION
+EXCEPTION	= src/exception/syntax.cpp
 
 ### DATA
-DATA	= src/data/derived_types.cpp
+DATA		= src/data/derived_types.cpp
 
 ########################
-SRC	=  $(MAIN) $(SYNTAX) $(ARCHI) $(UTILS) $(DATA)
+SRC	=  $(MAIN) $(SYNTAX) $(ARCHI) $(EXCEPTION) $(DATA)
 
 FLAGS	= -W -Wall -Wextra $(INC) -std=c++11 -g3
 

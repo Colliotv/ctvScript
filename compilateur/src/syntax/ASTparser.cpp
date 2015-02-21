@@ -3,7 +3,7 @@
 #include "syntax/ASTparser.h"
 #include "syntax/dictionnary.h"
 
-#include "utils/exception.h"
+#include "exception/syntax.h"
 namespace ctvscript {
   namespace parser {
 
@@ -24,18 +24,18 @@ namespace ctvscript {
 	  _cursor.m_line += 1, _cursor.m_column = 0;
 	  break;
 	case syntax::identifier::unknown:
-	  throw exception::identification_error(utils::cursor_indicator(_save.m_line, _save.m_column),
-						utils::seize_line((syntax::cursor&)_cursor, t_file));
+	  throw exception::syntax::identification_error(utils::cursor_indicator(_save.m_line, _save.m_column),
+							utils::seize_line((syntax::cursor&)_cursor, t_file));
 	  break;
 	default:
 	  std::string _syntax((syntax::cursor&)_save, (syntax::cursor&)_cursor);
 	  AST::node* new_node = AST::factory::create_node_by_syntax(_identifier.first, _syntax,
 								    AST::node::syntax(utils::seize_line((syntax::cursor&)_cursor,
 													t_file), 
-										      _save.m_line, _save.m_column));
+										      _save.m_column, _save.m_line));
 	  if (new_node == nullptr)
-	    throw exception::identification_error(utils::cursor_indicator(_save.m_line, _save.m_column),
-						  utils::seize_line((syntax::cursor&)_cursor, t_file));
+	    throw exception::syntax::identification_error(utils::cursor_indicator(_save.m_line, _save.m_column),
+							  utils::seize_line((syntax::cursor&)_cursor, t_file));
 	  _list.push_back(new_node);
 	  std::cerr << "for syntax::identifier("<< static_cast<int>(_identifier.first)
 		    <<") and _syntax( "<< _syntax

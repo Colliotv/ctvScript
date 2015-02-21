@@ -18,7 +18,7 @@ class FunctionForwardDeclaration;
 # include "lines/ArgumentListLine.h" // != CallerParameterList
 class ArgumentListLine;
 
-# include "lines/Type.h"
+# include "lines/TypeDefinition.h"
 class TypeDefinition;
 
 # include "lines/ScopedId.h"

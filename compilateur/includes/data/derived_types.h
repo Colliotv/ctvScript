@@ -1,6 +1,8 @@
 #ifndef Derived_Types_h__
 # define Derived_Types_h__
 
+#include <iostream>
+
 #include <string>
 #include <map>
 
@@ -79,22 +81,32 @@ namespace ctvscript {
 	public:
 	  bool			exist	(const std::string&) const;
 	  const wrapper*	at	(const std::string&) const;
+	  wrapper*		at	(const std::string&);
 
 	private:
-	  const wrapper*	m_up;
+	  wrapper*		m_up;
 
 	public:
-	  void			setUp(const wrapper*);
-	  const wrapper*	getUp() const;
+	  void			setUp(wrapper*);
+	  wrapper*		getUp();
+
+	public:
+	  bool			is_scope() const;
+
+	public:
+	  container::interface*	get_type();
 
 	public:
 	  /* type */
 	  wrapper(container::interface* t_type)
-	    : m_type(t_type), m_is_scope(false), m_table(), m_up(NULL) {}
+	    : m_type(t_type), m_is_scope(false), m_table(), m_up(NULL) {
+	    std::cout << "type designed" << std::endl;
+	  }
 	
 	  /* class */
 	  wrapper(container::interface* t_type, type::map&& t_table)
 	    : m_type(t_type), m_is_scope(true), m_table(t_table), m_up(NULL) {
+	    std::cout << "class designed" << std::endl;
 	    for (type::map::value_type& t : m_table)
 	      t.second.setUp(this);
 	  }
@@ -102,6 +114,7 @@ namespace ctvscript {
 	  /* namespace */
 	  wrapper(type::map&& t_table)
 	    : m_type(NULL), m_is_scope(true), m_table(std::move(t_table)), m_up(NULL) {
+	    std::cout << "scope designed" << std::endl;
 	    for (type::map::value_type& t : m_table)
 	      t.second.setUp(this);
 	  }

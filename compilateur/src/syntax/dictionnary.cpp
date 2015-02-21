@@ -60,7 +60,7 @@ namespace ctvscript {
 	{syntax::identifier::superior_equal,		{SIZED_REGEX(">=", 2)}},
 	{syntax::identifier::equality,			{SIZED_REGEX("==", 2)}},
 
-	{syntax::identifier::comma,			{VARIABLE_REGEX("\\,")}},
+	{syntax::identifier::comma,			{VARIABLE_REGEX(",")}},
 
 	{syntax::identifier::struct_dereference,	{VARIABLE_REGEX("\\.")}},
 	{syntax::identifier::struct_reference,		{SOLID_REGEX("->")}},

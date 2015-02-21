@@ -4,8 +4,13 @@ namespace ctvscript {
   namespace AST {
 
     /* ##  Node:: syntax  ## */
-    node::syntax::syntax(const std::string& t_file_line, std::size_t t_column, std::size_t t_line)
+    node::syntax::	syntax(const std::string& t_file_line, std::size_t t_column, std::size_t t_line)
       : m_file_line(t_file_line), m_column(t_column), m_line(t_line) {}
+
+    std::string		node::syntax::get_file_line() const { return m_file_line; }
+    std::size_t		node::syntax::get_column() const { return m_column; }
+    std::size_t		node::syntax::get_line() const { return m_line; }
+
 
     /* ## Node:: Ctor ## */
     node::node(const std::string& t_string_syntax, const node::syntax& t_syntax)
