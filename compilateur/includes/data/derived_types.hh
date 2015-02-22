@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 
-#include "data/types.h"
+#include "data/types.hh"
 
 namespace ctvscript {
   namespace byte_code {
@@ -94,7 +94,7 @@ namespace ctvscript {
 	  bool			is_scope() const;
 
 	public:
-	  container::interface*	get_type();
+	  const container::interface*	get_type() const;
 
 	public:
 	  /* type */

@@ -17,7 +17,8 @@ ARCHI_LINE	= \
 		src/architecture/line/TypeDefinition.cpp
 
 ARCHI_NODE	= \
-		src/architecture/node/type_definition.cpp
+		src/architecture/node/type_definition.cpp \
+		src/architecture/node/scoped_type.cpp
 
 
 ARCHI		= src/architecture/ASTfactory.cpp \

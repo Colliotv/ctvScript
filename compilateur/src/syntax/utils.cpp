@@ -1,4 +1,4 @@
-#include "syntax/utils.h"
+#include "syntax/utils.hh"
 
 namespace ctvscript {
   namespace parser {

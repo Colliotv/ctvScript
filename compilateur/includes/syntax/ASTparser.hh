@@ -4,8 +4,8 @@
 #include <string>
 #include <list>
 
-#include "syntax/utils.h"
-#include "architecture/ASTnode.h"
+#include "syntax/utils.hh"
+#include "architecture/ASTnode.hh"
 
 namespace ctvscript {
   namespace parser {

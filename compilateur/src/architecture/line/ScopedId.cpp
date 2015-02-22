@@ -1,7 +1,7 @@
 #include <iostream>
 #include "architecture/ASTgrammar.hpp"
 
-# include "data/derived_types.h"
+# include "data/derived_types.hh"
 
 namespace ctvscript {
   namespace AST {

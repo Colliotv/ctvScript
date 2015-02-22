@@ -4,13 +4,13 @@
 
 # include <list>
 
-# include "architecture/ASTnode.h"
+# include "architecture/ASTnode.hh"
 
 namespace ctvscript {
   namespace AST {
     namespace tree{
 
-      # include "grammar/line.h"
+      # include "grammar/line.hh"
 
       template<AST::tree::line_name line, typename superior_node>
       struct GrammarLine{
@@ -74,7 +74,7 @@ namespace ctvscript {
       template<AST::tree::line_name line>
       struct Call{};
 
-      # include "grammar/grammar.h"
+      # include "grammar/grammar.hh"
     };
 
 

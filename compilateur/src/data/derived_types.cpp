@@ -1,4 +1,4 @@
-#include "data/derived_types.h"
+#include "data/derived_types.hh"
 
 namespace ctvscript {
   namespace byte_code {
@@ -30,7 +30,7 @@ namespace ctvscript {
 
 	bool		wrapper::is_scope() const	{ return m_is_scope; }
 
-	container::interface*	wrapper::get_type()	{ return m_type; }
+	const container::interface*	wrapper::get_type() const	{ return m_type; }
 
 	/*
 	 * Table Definitions

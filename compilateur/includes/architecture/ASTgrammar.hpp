@@ -2,7 +2,7 @@
 # define ASTgrammar_hpp__
 
 #include <iostream>
-#include "architecture/ASTgrammar.h"
+#include "architecture/ASTgrammar.hh"
 
 namespace ctvscript {
   namespace AST {

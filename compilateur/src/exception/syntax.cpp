@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include "exception/syntax.h"
+#include "exception/syntax.hh"
 
 namespace ctvscript {
   namespace utils {

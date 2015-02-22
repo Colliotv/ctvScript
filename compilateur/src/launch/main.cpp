@@ -2,10 +2,10 @@
 #include <fstream>
 #include <iostream>
 
-# include "syntax/ASTparser.h"
-# include "architecture/ASTgrammar.h"
+# include "syntax/ASTparser.hh"
+# include "architecture/ASTgrammar.hh"
 
-# include "exception/syntax.h"
+# include "exception/syntax.hh"
 
 int main(int ac, char** av) {
   if (ac != 2) {

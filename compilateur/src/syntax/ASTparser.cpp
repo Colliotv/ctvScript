@@ -1,9 +1,10 @@
 #include <iostream>
 
-#include "syntax/ASTparser.h"
-#include "syntax/dictionnary.h"
+#include "syntax/ASTparser.hh"
+#include "syntax/dictionnary.hh"
 
-#include "exception/syntax.h"
+#include "exception/syntax.hh"
+
 namespace ctvscript {
   namespace parser {
 

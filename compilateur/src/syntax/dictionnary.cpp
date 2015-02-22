@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "syntax/dictionnary.h"
+#include "syntax/dictionnary.hh"
 
 namespace ctvscript {
   namespace parser {

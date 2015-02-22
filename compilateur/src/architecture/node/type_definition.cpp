@@ -1,2 +1,2 @@
-#include "architecture/ASTnode.h"
+#include "architecture/ASTnode.hh"
 

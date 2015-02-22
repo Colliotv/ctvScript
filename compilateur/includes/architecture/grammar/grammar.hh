@@ -6,25 +6,25 @@
 # define INCLUDED_FROM_GRAMMAR_LINE
 
 
-# include "lines/GlobalState.h"
+# include "lines/GlobalState.hpp"
 class GlobalState;
 
-# include "lines/FunctionPrototype.h"
+# include "lines/FunctionPrototype.hpp"
 class FunctionPrototype;
 
-# include "lines/FunctionForwardDeclaration.h"
+# include "lines/FunctionForwardDeclaration.hpp"
 class FunctionForwardDeclaration;
 
-# include "lines/ArgumentListLine.h" // != CallerParameterList
+# include "lines/ArgumentListLine.hpp"
 class ArgumentListLine;
 
-# include "lines/TypeDefinition.h"
+# include "lines/TypeDefinition.hpp"
 class TypeDefinition;
 
-# include "lines/ScopedId.h"
+# include "lines/ScopedId.hpp"
 class ScopedId;
 
-# include "lines/ScopedType.h"
+# include "lines/ScopedType.hpp"
 class ScopedType;
 
 using Grammar = GrammarTree< GlobalState, FunctionForwardDeclaration, FunctionPrototype, TypeDefinition, ArgumentListLine, ScopedId, ScopedType >; 
