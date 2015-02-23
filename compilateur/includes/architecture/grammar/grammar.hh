@@ -5,6 +5,7 @@
 # endif
 # define INCLUDED_FROM_GRAMMAR_LINE
 
+//need another template that define the impact of a carriage return on one' gramar
 
 # include "lines/GlobalState.hpp"
 class GlobalState;

@@ -179,13 +179,23 @@ namespace ctvscript {
       static bool organize(std::list<node*>& t_ASTnodes, std::list<node*>::iterator& t_cursor,
 			   std::list<AST::node*>::iterator& t_further) {
 	bool retval = false;
-	std::list<node*>::iterator save = t_cursor;
+	std::size_t save = std::distance(t_ASTnodes.begin(), t_cursor);
+
 	retval = for_<typename tree::Grammar::fetch<line>::grammarLine::node_line>::organize(t_ASTnodes, t_cursor, t_further);
+
+	std::list<node*>::iterator _save = t_ASTnodes.begin();
+	std::advance(_save, save);
+
 	if (!retval) {
-	  t_cursor = save;
-	  utils::list_modifier(t_ASTnodes, save, t_further, tree::Grammar::fetch<line>::grammarLine::onError);
-	} else {
-	  utils::list_modifier(t_ASTnodes, save, t_cursor , tree::Grammar::fetch<line>::grammarLine::onMatch);
+	  t_cursor = _save;	  
+	  /** will not change the list if error
+	      utils::list_modifier(t_ASTnodes, save, t_further, );
+	  */
+	  std::cerr << "ERROR FOR:";
+	  tree::Grammar::fetch<line>::grammarLine::onError(std::list<node*>(t_cursor, t_further));
+	} else {  
+	  utils::list_modifier(t_ASTnodes, _save, t_cursor , tree::Grammar::fetch<line>::grammarLine::onMatch);
+	  t_further = t_cursor;
 	}
 	return (retval);
       }

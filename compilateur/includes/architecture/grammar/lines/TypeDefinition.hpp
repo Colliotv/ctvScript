@@ -29,26 +29,31 @@ class TypeDefinition
         Match<AST::symbol::Reference>
 	, 0, 1>,
       Repeat<
-	Or<
+	And<
+	   Match<AST::symbol::Bparenthesis>,
+	   Or<
+	     And<
+	       Repeat<
+		 And<
+		   Call<line_name::type_definition>,
+		   Match<AST::symbol::Comma>
+		 >
+		 ,0>,
+	       Call<line_name::type_definition>
+	       >,
+	     Repeat<
+                Call<line_name::type_definition>
+             ,0,1>
+           >,
+	  Match<AST::symbol::Eparenthesis>
+	  >
+	, 0, 1>,
+      Repeat<
 	  And<
 	    Match<AST::symbol::Bsqbracket>,
 	    Match<AST::values::Integer>,
 	    Match<AST::symbol::Esqbracket>
-	    >,
-	  And<
-	    Match<AST::symbol::Bparenthesis>,
-	    Repeat<
-	      And<
-		Call<line_name::type_definition>,
-		Match<AST::symbol::Comma>
-		>
-	      ,0>,
-	    Repeat<
-	      Call<line_name::type_definition>
-	      ,0,1>,
-	    Match<AST::symbol::Eparenthesis>
 	    >
-	  >
       , 0>
       >,
   Match<AST::final::Type>

@@ -53,14 +53,17 @@ namespace ctvscript {
 	  template<typename __derived>
 	  class derived			: public interface {
 	  private:
-	    container::interface&		m_derived_type;
+	    container::interface*		m_derived_type;
 
 	  public:
-	    derived(container::interface&);
-	    ~derived();
+	    derived(container::interface* _derived_type)
+	      : m_derived_type(_derived_type) {}
+	    ~derived() {}
 
 	  public:
-	    virtual type::interface*		deep_copy() const;
+	    virtual type::container::interface*		deep_copy() const {
+	      return (new derived<__derived>(m_derived_type->deep_copy()));
+	    }
 	  };
 	};
 

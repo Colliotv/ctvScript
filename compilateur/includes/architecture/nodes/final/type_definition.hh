@@ -5,10 +5,16 @@
 # endif
 
 class Type : public AST::node{
+private:
+  byte_code::data::type::container::interface*	m_type;
 
 public:
-  Type(const std::string& t_file_line, const node::syntax& t_node_syntax)
-    : AST::node(t_file_line, t_node_syntax){}
+  Type(const std::string& t_file_line,
+       const node::syntax& t_node_syntax,
+       byte_code::data::type::container::interface* t_type);
+
+public:
+  byte_code::data::type::container::interface*	getType();  
 };
 
 #endif

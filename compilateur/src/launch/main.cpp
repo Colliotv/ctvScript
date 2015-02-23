@@ -8,6 +8,11 @@
 # include "exception/syntax.hh"
 
 int main(int ac, char** av) {
+  int a = 0;
+
+
+  ++a;// atomic_incr_(a, 1)
+
   if (ac != 2) {
     std::cerr
       << av[0]
